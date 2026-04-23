@@ -17,7 +17,6 @@ from hotkeys import setup_hotkeys, remove_hotkeys
 from utils.logger import logger
 from utils.config import LIVE_CONFIG
 from utils.screen_utils import get_screenshot_for_processing, select_region_interactive
-from overlay import OverlayWindow
 
 
 class LivePokerAnalyzer:
@@ -52,10 +51,6 @@ class LivePokerAnalyzer:
         self.required_stable_frames = 2
         self.last_strategy = None
         self.last_valid_stacks: Dict[str, Optional[float]] = {'hero': None, 'villain': None}
-
-        self.overlay = OverlayWindow()
-        if LIVE_CONFIG.get('show_overlay', True):
-            self.overlay.start()
 
     def _format_cards(self, cards) -> str:
         valid_cards = [str(card) for card in cards if card]
@@ -116,6 +111,7 @@ class LivePokerAnalyzer:
     def _is_actionable_spot(self, game_state: Dict[str, Any]) -> bool:
         return bool(
             game_state.get('is_my_turn', False)
+            and game_state.get('buttons_confirmed', False)
             and game_state.get('available_actions', [])
         )
 
@@ -988,7 +984,6 @@ class LivePokerAnalyzer:
 
                         logger.debug(f"Strategie: {strategy}")
                         self._print_live_summary(game_state, strategy)
-                        self._update_overlay(game_state, strategy)
 
                         if LIVE_CONFIG.get('voice_enabled', False) and self._is_actionable_spot(game_state):
                             voice_payload = {
@@ -1133,34 +1128,8 @@ class LivePokerAnalyzer:
         else:
             logger.warning("Manuelles Raise angefordert, aber nicht am Zug oder kein gültiger Zustand.")
 
-    def _update_overlay(self, game_state: Dict[str, Any], strategy: Dict[str, Any]):
-        monte_carlo = strategy.get('monte_carlo', {}) or {}
-        solver_decision = strategy.get('solver_decision', {}) or {}
-        board = self._format_cards(game_state.get('community_cards', []))
-        self.overlay.update({
-            'action': strategy.get('recommended_action', '---'),
-            'amount': float(strategy.get('amount', 0.0) or 0.0),
-            'is_my_turn': bool(game_state.get('is_my_turn', False)),
-            'street': str(game_state.get('street', '')).upper(),
-            'hole': self._format_cards(game_state.get('hole_cards', [])),
-            'board': board,
-            'equity': float(monte_carlo.get('hand_equity', strategy.get('equity_proxy', 0.0)) or 0.0),
-            'odds': float(strategy.get('pot_odds', game_state.get('to_call', 0.0)) or 0.0),
-            'solver_action': str(solver_decision.get('recommended_action', '') or ''),
-            'villain_style': str((strategy.get('opponent_profile', {}) or {}).get('style', '') or ''),
-        })
-
-    def toggle_overlay(self):
-        if self.overlay._running:
-            self.overlay.stop()
-            logger.info("Overlay ausgeblendet.")
-        else:
-            self.overlay.start()
-            logger.info("Overlay eingeblendet.")
-
     def stop_bot(self):
         logger.info("Stopp-Signal empfangen.")
-        self.overlay.stop()
         self.running = False
         self.stop_event.set()
         self.session_manager.close_session()

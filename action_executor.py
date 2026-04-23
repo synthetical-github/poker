@@ -500,25 +500,12 @@ class ActionExecutor:
             detected['available_actions'] = []
         detected['is_my_turn'] = len(detected['available_actions']) >= 2
         valid_action_sets = {
-            # 3-button combinations
             ('bet', 'check', 'fold'),
             ('check', 'fold', 'raise'),
             ('call', 'fold', 'raise'),
             ('bet', 'call', 'fold'),
-            ('check', 'raise', 'fold'),
-            ('bet', 'check', 'raise'),
-            # 2-button combinations (common in heads-up)
-            ('call', 'fold'),
-            ('check', 'fold'),
-            ('bet', 'fold'),
-            ('check', 'raise'),
-            ('call', 'raise'),
         }
-        action_tuple = tuple(sorted(detected['available_actions']))
-        detected['buttons_confirmed'] = (
-            action_tuple in valid_action_sets
-            or len(detected['available_actions']) >= 2
-        )
+        detected['buttons_confirmed'] = tuple(sorted(detected['available_actions'])) in valid_action_sets
         self._last_action_fingerprint = fingerprint
         self._last_action_state = copy.deepcopy(detected)
         return detected

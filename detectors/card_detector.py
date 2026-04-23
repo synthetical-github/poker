@@ -1166,13 +1166,7 @@ class CardDetector:
         # Im kompakten Heads-up-Layout sind einzelne helle UI-Elemente haeufige
         # False-Positives. Teure OCR/Template-Loops starten wir deshalb erst,
         # wenn mindestens ein plausibler Flop-Block sichtbar ist.
-        # Schwellenwert auf 1 gesetzt: schon eine erkannte Kartenoberflaeche
-        # (z. B. Karte 1 von 3 beim Flop) reicht aus, um die Erkennung zu starten.
-        logger.debug(
-            f"Community-Card Surface-Check: {surface_count} von {len(community_card_regions)} "
-            f"Regionen positiv ({surface_flags})"
-        )
-        if compact_heads_up_layout and surface_count < 1:
+        if compact_heads_up_layout and surface_count < 3:
             return [], 0
 
         detected_cards: List[Card] = []
@@ -1256,18 +1250,13 @@ class CardDetector:
         best = primary
 
         primary_board_count = len(primary["community_cards"])
-        primary_surface_count = int(primary.get("surface_count", 0))
         primary_is_complete = (
             len(primary["hole_cards"]) == 2
             and primary_board_count in {0, 3, 4, 5}
         )
-        # Auch dann Backup versuchen, wenn mindestens 2 Karten-Oberflaechen
-        # sichtbar sind, aber keine Karte erkannt wurde – z.B. wenn alle
-        # Board-Templates scheitern (falsches Layout / schlechte Matches).
         primary_needs_backup = (
             not primary_is_complete
             or (len(primary["hole_cards"]) == 0 and primary_board_count == 0)
-            or (len(primary["hole_cards"]) == 2 and primary_board_count == 0 and primary_surface_count >= 2)
         )
 
         if primary_needs_backup:
@@ -1593,12 +1582,10 @@ class CardDetector:
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
         mask_ratio = float(np.mean(mask > 0))
         if mask_ratio >= 0.45:
-            logger.debug(f"_has_community_card_surface: True (mask_ratio={mask_ratio:.2f} >= 0.45)")
             return True
 
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if not contours:
-            logger.debug(f"_has_community_card_surface: False (keine Konturen, mask_ratio={mask_ratio:.2f})")
             return False
 
         roi_h, roi_w = roi_bgr.shape[:2]
@@ -1606,26 +1593,14 @@ class CardDetector:
         contour = max(contours, key=cv2.contourArea)
         contour_area = cv2.contourArea(contour)
         if contour_area < roi_area * 0.16:
-            logger.debug(
-                f"_has_community_card_surface: False (contour_area={contour_area:.0f} < {roi_area * 0.16:.0f}, "
-                f"mask_ratio={mask_ratio:.2f})"
-            )
             return False
 
         x, y, w, h = cv2.boundingRect(contour)
         if w < roi_w * 0.38 or h < roi_h * 0.52:
-            logger.debug(
-                f"_has_community_card_surface: False (bbox w={w} < {roi_w * 0.38:.0f} oder h={h} < {roi_h * 0.52:.0f}, "
-                f"mask_ratio={mask_ratio:.2f})"
-            )
             return False
 
         aspect_ratio = w / float(max(h, 1))
         if not 0.42 <= aspect_ratio <= 0.95:
-            logger.debug(
-                f"_has_community_card_surface: False (aspect_ratio={aspect_ratio:.2f} ausserhalb 0.42-0.95, "
-                f"mask_ratio={mask_ratio:.2f})"
-            )
             return False
 
         bbox = gray[y:y+h, x:x+w]
@@ -1634,16 +1609,8 @@ class CardDetector:
 
         bright_ratio = float(np.mean(bbox > 105))
         if bright_ratio < 0.45:
-            logger.debug(
-                f"_has_community_card_surface: False (bright_ratio={bright_ratio:.2f} < 0.45, "
-                f"mask_ratio={mask_ratio:.2f})"
-            )
             return False
 
-        logger.debug(
-            f"_has_community_card_surface: True (contour, mask_ratio={mask_ratio:.2f}, "
-            f"bright_ratio={bright_ratio:.2f}, aspect={aspect_ratio:.2f})"
-        )
         return True
 
     def _prepare_rank_candidates(self, card_surface_bgr: np.ndarray) -> List[np.ndarray]:

@@ -2,41 +2,9 @@ venv/
 .venv/
 __pycache__/
 *.pyc
-*.pyc.*
 .env
 build/
 dist/
 *.egg-info/
 .vscode/
 .idea/
-
-# Logs
-logs/
-*.log
-
-# Debug output images (root level)
-debug_*/
-board_debug*/
-hero_debug*/
-hero_ref_debug/
-live_hero_debug/
-rank_debug/
-rank_manual/
-rank_probe/
-roi_debug*/
-roi_debug_after/
-capture_diagnostics/
-extract_debug/
-tmp_*/
-pokerset/
-
-# Temporary debug PNGs (root level)
-*.png
-
-# Replay/test JSON files (large)
-full_folder_replay*.json
-replay_report.json
-replay_smoke5.json
-rth_single_replay.json
-wef_single_replay*.json
-screenshot_replay_user_sample*.json
