@@ -111,7 +111,6 @@ class LivePokerAnalyzer:
     def _is_actionable_spot(self, game_state: Dict[str, Any]) -> bool:
         return bool(
             game_state.get('is_my_turn', False)
-            and game_state.get('buttons_confirmed', False)
             and game_state.get('available_actions', [])
         )
 
