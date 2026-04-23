@@ -14,6 +14,7 @@ from strategy_engine import StrategyEngine
 from voice_announcer import VoiceAnnouncer
 from session_manager import SessionManager
 from hotkeys import setup_hotkeys, remove_hotkeys
+from overlay import OverlayWindow
 from utils.logger import logger
 from utils.config import LIVE_CONFIG
 from utils.screen_utils import get_screenshot_for_processing, select_region_interactive
@@ -51,6 +52,10 @@ class LivePokerAnalyzer:
         self.required_stable_frames = 2
         self.last_strategy = None
         self.last_valid_stacks: Dict[str, Optional[float]] = {'hero': None, 'villain': None}
+
+        self.overlay = OverlayWindow()
+        if LIVE_CONFIG.get('show_overlay', True):
+            self.overlay.start()
 
     def _format_cards(self, cards) -> str:
         valid_cards = [str(card) for card in cards if card]
@@ -268,7 +273,41 @@ class LivePokerAnalyzer:
             self.last_summary_output = summary
             self.last_summary_time = now
 
-    def _build_state_signature(self, game_state: Dict[str, Any]) -> tuple:
+    def _update_overlay(self, game_state: Dict[str, Any], strategy: Dict[str, Any]):
+        try:
+            monte_carlo = strategy.get('monte_carlo', {}) or {}
+            hand_equity = float(monte_carlo.get('hand_equity', strategy.get('equity_proxy', 0.0)) or 0.0)
+            pot_odds = float(strategy.get('pot_odds', game_state.get('to_call', 0.0)) or 0.0)
+            solver_decision = strategy.get('solver_decision', {}) or {}
+            solver_action = str(solver_decision.get('recommended_action', '') or '')
+            board = game_state.get('community_cards', [])
+            street = str(game_state.get('street', self._infer_street_from_board_count(len(board)))).upper()
+            hole = self._format_cards(game_state.get('hole_cards', []))
+            board_str = self._format_cards(board) if board else ''
+            self.overlay.update({
+                'action': str(strategy.get('recommended_action', '---')),
+                'amount': float(strategy.get('amount', 0.0) or 0.0),
+                'is_my_turn': bool(self._is_actionable_spot(game_state)),
+                'street': street,
+                'hole': hole,
+                'board': board_str,
+                'equity': hand_equity,
+                'odds': pot_odds,
+                'solver_action': solver_action,
+                'villain_style': str(strategy.get('opponent_profile', {}).get('style', '') or ''),
+            })
+        except Exception as e:
+            logger.debug(f"Overlay update error: {e}")
+
+    def toggle_overlay(self):
+        if self.overlay._running:
+            self.overlay.stop()
+            logger.info("Overlay ausgeblendet.")
+        else:
+            self.overlay.start()
+            logger.info("Overlay eingeblendet.")
+
+
         return (
             tuple(str(card) for card in game_state.get('hole_cards', [])),
             tuple(str(card) for card in game_state.get('community_cards', [])),
@@ -983,6 +1022,7 @@ class LivePokerAnalyzer:
 
                         logger.debug(f"Strategie: {strategy}")
                         self._print_live_summary(game_state, strategy)
+                        self._update_overlay(game_state, strategy)
 
                         if LIVE_CONFIG.get('voice_enabled', False) and self._is_actionable_spot(game_state):
                             voice_payload = {
@@ -1131,6 +1171,7 @@ class LivePokerAnalyzer:
         logger.info("Stopp-Signal empfangen.")
         self.running = False
         self.stop_event.set()
+        self.overlay.stop()
         self.session_manager.close_session()
         remove_hotkeys()
         if not self.headless:

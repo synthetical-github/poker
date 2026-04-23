@@ -58,6 +58,7 @@ LIVE_CONFIG = {
 
     # Laufzeit / Anzeige
     'voice_enabled': False,
+    'show_overlay': True,
     'show_debug_window': False,
     'show_live_summary': False,
     'show_recommendation_line': True,

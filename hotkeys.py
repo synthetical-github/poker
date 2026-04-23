@@ -13,6 +13,7 @@ def setup_hotkeys(analyzer):
         'f5': {'action': analyzer.calibrate_rois, 'description': 'Calibrate ROIs'}, # Benötigt Implementierung
         'f6': {'action': analyzer.toggle_pause, 'description': 'Toggle Pause'},
         'f7': {'action': analyzer.toggle_voice, 'description': 'Toggle Voice Announcer'},
+        'f8': {'action': analyzer.toggle_overlay, 'description': 'Toggle Overlay'},
         'ctrl+q': {'action': analyzer.stop_bot, 'description': 'Stop Bot'}, # Hotkey zum Beenden
     }
     
