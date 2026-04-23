@@ -307,7 +307,7 @@ class LivePokerAnalyzer:
             self.overlay.start()
             logger.info("Overlay eingeblendet.")
 
-
+    def _build_state_signature(self, game_state: Dict[str, Any]) -> tuple:
         return (
             tuple(str(card) for card in game_state.get('hole_cards', [])),
             tuple(str(card) for card in game_state.get('community_cards', [])),
