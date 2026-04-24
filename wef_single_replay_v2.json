@@ -1,0 +1,39 @@
+[
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\wefdfsfg.png",
+    "hole_cards": [
+      "3S",
+      "TD"
+    ],
+    "community_cards": [
+      "QS",
+      "9H",
+      "3C"
+    ],
+    "street": "flop",
+    "pot_size": 0.8,
+    "to_call": 7.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.77,
+    "reason": "one_pair | strength=0.52 | equity=0.52 | pot_odds=0.90 | texture=dry | insufficient_equity",
+    "hand_category": "one_pair",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 11136.27
+  }
+]

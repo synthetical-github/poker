@@ -60,7 +60,12 @@ class OverlayWindow:
         root = tk.Tk()
         self._root = root
         root.title("Poker Bot")
-        root.geometry(f"{self._WIDTH}x{self._HEIGHT}+20+20")
+        root.update_idletasks()
+        screen_w = root.winfo_screenwidth()
+        screen_h = root.winfo_screenheight()
+        pos_x = screen_w - self._WIDTH - 20
+        pos_y = screen_h - self._HEIGHT - 60  # 60px Abstand von Taskbar
+        root.geometry(f"{self._WIDTH}x{self._HEIGHT}+{pos_x}+{pos_y}")
         root.configure(bg=self._BG)
         root.attributes("-topmost", True)
         root.attributes("-alpha", 0.88)

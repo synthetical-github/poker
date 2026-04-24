@@ -1,0 +1,923 @@
+[
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_11.png",
+    "hole_cards": [
+      "TD",
+      "9D"
+    ],
+    "community_cards": [
+      "JH",
+      "3C",
+      "5S",
+      "KH",
+      "6S"
+    ],
+    "street": "river",
+    "pot_size": 0.0,
+    "to_call": 0.0,
+    "available_actions": [],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.77,
+    "reason": "High Card | strength=0.34 | equity=0.42 | pot_odds=0.00 | texture=semi_wet | pot_control",
+    "hand_category": "High Card",
+    "board_texture": "semi_wet",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": true,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1510.25
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_12.png",
+    "hole_cards": [
+      "4H",
+      "4S"
+    ],
+    "community_cards": [
+      "2H",
+      "5S",
+      "7C"
+    ],
+    "street": "flop",
+    "pot_size": 0.4,
+    "to_call": 5.0,
+    "available_actions": [],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.81,
+    "reason": "Pair | strength=0.50 | equity=0.50 | pot_odds=0.93 | texture=dry | insufficient_equity",
+    "hand_category": "Pair",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1126.08
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_13.png",
+    "hole_cards": [
+      "4H",
+      "4S"
+    ],
+    "community_cards": [
+      "2H",
+      "5S",
+      "7C",
+      "5D",
+      "TS"
+    ],
+    "street": "river",
+    "pot_size": 0.8,
+    "to_call": 0.0,
+    "available_actions": [],
+    "recommended_action": "bet",
+    "amount": 1.0,
+    "confidence": 0.97,
+    "reason": "Two Pair | strength=0.67 | equity=0.71 | pot_odds=0.00 | texture=dry_paired | value_bet",
+    "hand_category": "Two Pair",
+    "board_texture": "dry_paired",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1122.07
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_14.png",
+    "hole_cards": [
+      "6H",
+      "AH"
+    ],
+    "community_cards": [
+      "7C",
+      "JC",
+      "4D"
+    ],
+    "street": "flop",
+    "pot_size": 0.2,
+    "to_call": 0.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.7,
+    "reason": "High Card | strength=0.31 | equity=0.31 | pot_odds=0.00 | texture=dry | pot_control",
+    "hand_category": "High Card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2144.93
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_15.png",
+    "hole_cards": [
+      "6H",
+      "AH"
+    ],
+    "community_cards": [
+      "7C",
+      "JC",
+      "4D",
+      "8S",
+      "QD"
+    ],
+    "street": "river",
+    "pot_size": 1.2,
+    "to_call": 1.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.52,
+    "reason": "High Card | strength=0.34 | equity=0.42 | pot_odds=0.45 | texture=semi_wet | insufficient_equity",
+    "hand_category": "High Card",
+    "board_texture": "semi_wet",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": true,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2282.49
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_16.png",
+    "hole_cards": [
+      "9D",
+      "TH"
+    ],
+    "community_cards": [
+      "QS",
+      "8H",
+      "4S"
+    ],
+    "street": "flop",
+    "pot_size": 0.5,
+    "to_call": 0.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.76,
+    "reason": "High Card | strength=0.31 | equity=0.39 | pot_odds=0.00 | texture=dry | pot_control",
+    "hand_category": "High Card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": true,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2111.55
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_17.png",
+    "hole_cards": [
+      "TC",
+      "2S"
+    ],
+    "community_cards": [
+      "3H",
+      "AH",
+      "4H"
+    ],
+    "street": "flop",
+    "pot_size": 0.6,
+    "to_call": 0.2,
+    "available_actions": [
+      "fold",
+      "call",
+      "raise"
+    ],
+    "recommended_action": "call",
+    "amount": 0.0,
+    "confidence": 0.68,
+    "reason": "High Card | strength=0.30 | equity=0.48 | pot_odds=0.20 | texture=monotone | profitable_continue",
+    "hand_category": "High Card",
+    "board_texture": "monotone",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": true,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2680.06
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_18.png",
+    "hole_cards": [
+      "TD",
+      "AC"
+    ],
+    "community_cards": [
+      "4C",
+      "9S",
+      "7H"
+    ],
+    "street": "flop",
+    "pot_size": 0.4,
+    "to_call": 0.49,
+    "available_actions": [],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.58,
+    "reason": "High Card | strength=0.31 | equity=0.36 | pot_odds=0.49 | texture=dry | insufficient_equity",
+    "hand_category": "High Card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 2,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1025.86
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_19.png",
+    "hole_cards": [
+      "TD",
+      "AC"
+    ],
+    "community_cards": [
+      "4C",
+      "9S",
+      "7H",
+      "QD"
+    ],
+    "street": "turn",
+    "pot_size": 4.4,
+    "to_call": 0.25,
+    "available_actions": [
+      "fold",
+      "call",
+      "raise"
+    ],
+    "recommended_action": "call",
+    "amount": 0.0,
+    "confidence": 0.68,
+    "reason": "High Card | strength=0.33 | equity=0.33 | pot_odds=0.05 | texture=dry | profitable_continue",
+    "hand_category": "High Card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2823.12
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_2.png",
+    "hole_cards": [
+      "AS",
+      "5C"
+    ],
+    "community_cards": [
+      "4H",
+      "TC",
+      "7H"
+    ],
+    "street": "flop",
+    "pot_size": 0.6,
+    "to_call": 0.2,
+    "available_actions": [
+      "fold",
+      "call",
+      "raise"
+    ],
+    "recommended_action": "call",
+    "amount": 0.0,
+    "confidence": 0.57,
+    "reason": "High Card | strength=0.31 | equity=0.31 | pot_odds=0.20 | texture=dry | profitable_continue",
+    "hand_category": "High Card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 5726.53
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_20.png",
+    "hole_cards": [
+      "7H",
+      "QS"
+    ],
+    "community_cards": [
+      "KS",
+      "4C",
+      "7C"
+    ],
+    "street": "flop",
+    "pot_size": 0.4,
+    "to_call": 0.5,
+    "available_actions": [],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.55,
+    "reason": "Pair | strength=0.53 | equity=0.53 | pot_odds=0.50 | texture=dry | insufficient_equity",
+    "hand_category": "Pair",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1131.83
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_21.png",
+    "hole_cards": [
+      "7H",
+      "QS"
+    ],
+    "community_cards": [
+      "KS",
+      "4C",
+      "7C",
+      "8C"
+    ],
+    "street": "turn",
+    "pot_size": 0.5,
+    "to_call": 0.2,
+    "available_actions": [
+      "fold",
+      "call",
+      "raise"
+    ],
+    "recommended_action": "call",
+    "amount": 0.0,
+    "confidence": 0.78,
+    "reason": "Pair | strength=0.54 | equity=0.58 | pot_odds=0.20 | texture=dry | profitable_continue",
+    "hand_category": "Pair",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2595.22
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_22.png",
+    "hole_cards": [
+      "AD",
+      "6S"
+    ],
+    "community_cards": [
+      "2S",
+      "8D",
+      "QC"
+    ],
+    "street": "flop",
+    "pot_size": 0.2,
+    "to_call": 0.19,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.58,
+    "reason": "High Card | strength=0.31 | equity=0.31 | pot_odds=0.19 | texture=dry | profitable_continue",
+    "hand_category": "High Card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2017.35
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_23.png",
+    "hole_cards": [
+      "AD",
+      "6S"
+    ],
+    "community_cards": [
+      "2S",
+      "8D",
+      "QC",
+      "4S",
+      "8C"
+    ],
+    "street": "river",
+    "pot_size": 0.8,
+    "to_call": 0.19,
+    "available_actions": [],
+    "recommended_action": "call",
+    "amount": 0.0,
+    "confidence": 0.79,
+    "reason": "Pair | strength=0.55 | equity=0.59 | pot_odds=0.19 | texture=dry_paired | profitable_continue",
+    "hand_category": "Pair",
+    "board_texture": "dry_paired",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1118.74
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_24.png",
+    "hole_cards": [
+      "6C",
+      "KD"
+    ],
+    "community_cards": [
+      "3S",
+      "8S",
+      "5C"
+    ],
+    "street": "flop",
+    "pot_size": 0.4,
+    "to_call": 5.0,
+    "available_actions": [],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.9,
+    "reason": "High Card | strength=0.31 | equity=0.31 | pot_odds=0.93 | texture=dry | insufficient_equity",
+    "hand_category": "High Card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1127.57
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_25.png",
+    "hole_cards": [
+      "6C",
+      "KD"
+    ],
+    "community_cards": [
+      "3S",
+      "8S",
+      "5C",
+      "3C"
+    ],
+    "street": "turn",
+    "pot_size": 0.4,
+    "to_call": 5.0,
+    "available_actions": [],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.76,
+    "reason": "Pair | strength=0.53 | equity=0.57 | pot_odds=0.93 | texture=dry_paired | insufficient_equity",
+    "hand_category": "Pair",
+    "board_texture": "dry_paired",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1178.2
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_26.png",
+    "hole_cards": [
+      "6C",
+      "KD"
+    ],
+    "community_cards": [
+      "3S",
+      "8S",
+      "5C",
+      "3C",
+      "TS"
+    ],
+    "street": "river",
+    "pot_size": 0.4,
+    "to_call": 0.5,
+    "available_actions": [],
+    "recommended_action": "call",
+    "amount": 0.0,
+    "confidence": 0.58,
+    "reason": "Pair | strength=0.54 | equity=0.58 | pot_odds=0.50 | texture=dry | profitable_continue",
+    "hand_category": "Pair",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1147.45
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_27.png",
+    "hole_cards": [
+      "QH",
+      "8S"
+    ],
+    "community_cards": [
+      "3C",
+      "7S",
+      "9S",
+      "JH"
+    ],
+    "street": "turn",
+    "pot_size": 2.0,
+    "to_call": 0.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.82,
+    "reason": "High Card | strength=0.33 | equity=0.50 | pot_odds=0.00 | texture=dry | pot_control",
+    "hand_category": "High Card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": true,
+      "double_gutshot": true,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2175.75
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_28.png",
+    "hole_cards": [
+      "QH",
+      "8S"
+    ],
+    "community_cards": [
+      "3C",
+      "7S",
+      "9S",
+      "JH",
+      "AC"
+    ],
+    "street": "river",
+    "pot_size": 1.0,
+    "to_call": 0.0,
+    "available_actions": [],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.83,
+    "reason": "High Card | strength=0.34 | equity=0.51 | pot_odds=0.00 | texture=semi_wet | pot_control",
+    "hand_category": "High Card",
+    "board_texture": "semi_wet",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": true,
+      "double_gutshot": true,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1158.93
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_3.png",
+    "hole_cards": [
+      "JS",
+      "5C"
+    ],
+    "community_cards": [
+      "4H",
+      "TS",
+      "6H",
+      "8H"
+    ],
+    "street": "turn",
+    "pot_size": 0.8,
+    "to_call": 0.0,
+    "available_actions": [],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.79,
+    "reason": "High Card | strength=0.32 | equity=0.44 | pot_odds=0.00 | texture=wet | pot_control",
+    "hand_category": "High Card",
+    "board_texture": "wet",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": true,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1135.67
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_4.png",
+    "hole_cards": [
+      "9H",
+      "9C"
+    ],
+    "community_cards": [],
+    "street": "preflop",
+    "pot_size": 0.4,
+    "to_call": 0.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "raise"
+    ],
+    "recommended_action": "raise",
+    "amount": 1.4,
+    "confidence": 0.87,
+    "reason": "Preflop 99 Score 0.87 | Open-Raise",
+    "hand_category": "Preflop",
+    "board_texture": "preflop",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2331.22
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_5.png",
+    "hole_cards": [
+      "9H",
+      "9C"
+    ],
+    "community_cards": [
+      "TC",
+      "3S",
+      "2C"
+    ],
+    "street": "flop",
+    "pot_size": 0.4,
+    "to_call": 0.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.89,
+    "reason": "Pair | strength=0.51 | equity=0.55 | pot_odds=0.00 | texture=dry | pot_control",
+    "hand_category": "Pair",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2154.81
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_6.png",
+    "hole_cards": [
+      "QS",
+      "3H"
+    ],
+    "community_cards": [
+      "8H",
+      "TH",
+      "QH"
+    ],
+    "street": "flop",
+    "pot_size": 0.4,
+    "to_call": 0.0,
+    "available_actions": [],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.97,
+    "reason": "Pair | strength=0.52 | equity=0.75 | pot_odds=0.00 | texture=monotone | take_free_card",
+    "hand_category": "Pair",
+    "board_texture": "monotone",
+    "draws": {
+      "flush_draw": true,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": true,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 1146.6
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_7.png",
+    "hole_cards": [
+      "QS",
+      "3H"
+    ],
+    "community_cards": [
+      "8H",
+      "TH",
+      "QH",
+      "3S",
+      "JS"
+    ],
+    "street": "river",
+    "pot_size": 0.8,
+    "to_call": 0.19,
+    "available_actions": [],
+    "recommended_action": "raise",
+    "amount": 1.19,
+    "confidence": 0.97,
+    "reason": "Two Pair | strength=0.68 | equity=0.99 | pot_odds=0.19 | texture=wet | aggressive_draw",
+    "hand_category": "Two Pair",
+    "board_texture": "wet",
+    "draws": {
+      "flush_draw": true,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": true,
+      "double_gutshot": false,
+      "pair_plus_draw": true,
+      "overcards": 0,
+      "combo_draw": true
+    },
+    "elapsed_ms": 1044.04
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_8.png",
+    "hole_cards": [
+      "TD",
+      "JH"
+    ],
+    "community_cards": [
+      "7D",
+      "TS",
+      "TC"
+    ],
+    "street": "flop",
+    "pot_size": 1.0,
+    "to_call": 0.19,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.97,
+    "reason": "Trips | strength=0.76 | equity=0.76 | pot_odds=0.16 | texture=dry_paired | strong_value",
+    "hand_category": "Trips",
+    "board_texture": "dry_paired",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 1,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2138.68
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\Screenshot_9.png",
+    "hole_cards": [
+      "TD",
+      "9D"
+    ],
+    "community_cards": [],
+    "street": "preflop",
+    "pot_size": 0.3,
+    "to_call": 0.1,
+    "available_actions": [
+      "fold",
+      "call",
+      "raise"
+    ],
+    "recommended_action": "call",
+    "amount": 0.0,
+    "confidence": 0.75,
+    "reason": "Preflop T9s Score 0.59 | Guter Call",
+    "hand_category": "Preflop",
+    "board_texture": "preflop",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 2737.5
+  }
+]

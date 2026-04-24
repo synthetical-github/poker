@@ -1,0 +1,39 @@
+[
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\rth.png",
+    "hole_cards": [
+      "8S",
+      "3C"
+    ],
+    "community_cards": [
+      "QH",
+      "7H",
+      "2C"
+    ],
+    "street": "flop",
+    "pot_size": 0.6,
+    "to_call": 0.1,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.63,
+    "reason": "high_card | strength=0.30 | equity=0.30 | pot_odds=0.10 | texture=dry | profitable_continue",
+    "hand_category": "high_card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 11102.22
+  }
+]

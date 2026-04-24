@@ -49,15 +49,78 @@ class LivePokerAnalyzer:
         self.last_state_signature = None
         self.pending_state_signature = None
         self.pending_state_count = 0
-        self.required_stable_frames = 2
+        self.required_stable_frames = 1
         self.last_strategy = None
         self.last_valid_stacks: Dict[str, Optional[float]] = {'hero': None, 'villain': None}
+
+        # Screenshot-Aufnahme für N Runden (manuell via F9)
+        self._capture_rounds_remaining = 0
+        self._capture_round_count = 0
+        self._capture_last_hole: tuple = ()
+        self._capture_frame_index = 0
+        # Auto-Screenshot bei jedem neuen Spielzustand
+        self._auto_capture_last_sig: str = ""
+        self._auto_capture_dir = 'auto_screenshots'
+        import os as _os; _os.makedirs(self._auto_capture_dir, exist_ok=True)
 
         self.overlay = OverlayWindow()
         if LIVE_CONFIG.get('show_overlay', True):
             self.overlay.start()
 
-    def _format_cards(self, cards) -> str:
+    def start_capture_rounds(self, rounds: int = 2):
+        """Startet automatische Screenshot-Aufnahme für N komplette Runden."""
+        import os
+        self._capture_rounds_remaining = rounds
+        self._capture_round_count = 0
+        self._capture_last_hole = ()
+        self._capture_frame_index = 0
+        os.makedirs('capture_rounds', exist_ok=True)
+        print(f"[BOT] Screenshot-Aufnahme gestartet: {rounds} Runden werden in capture_rounds/ gespeichert.", flush=True)
+
+    def _maybe_capture_screenshot(self, game_state: dict):
+        """Speichert Screenshot wenn Capture-Modus aktiv."""
+        if self._capture_rounds_remaining <= 0:
+            return
+        if self.last_screenshot is None:
+            return
+        import cv2, os, time as _time
+
+        # Neue Runde erkennen: Hole Cards haben sich geändert (neue Hand)
+        current_hole = tuple(str(c) for c in game_state.get('hole_cards', []) if c)
+        if current_hole and current_hole != self._capture_last_hole:
+            if self._capture_last_hole:  # Nicht beim allerersten Frame
+                self._capture_round_count += 1
+                print(f"[BOT] Runde {self._capture_round_count} abgeschlossen.", flush=True)
+                if self._capture_round_count >= self._capture_rounds_remaining + (1 if self._capture_last_hole == () else 0):
+                    self._capture_rounds_remaining = 0
+                    print(f"[BOT] Screenshot-Aufnahme beendet. {self._capture_frame_index} Frames gespeichert in capture_rounds/", flush=True)
+                    return
+            self._capture_last_hole = current_hole
+
+        ts = int(_time.time() * 1000)
+        self._capture_frame_index += 1
+        fname = f"capture_rounds/frame_{self._capture_frame_index:04d}_{ts}.png"
+        cv2.imwrite(fname, self.last_screenshot)
+
+    def _auto_capture_screenshot(self, game_state: dict):
+        """Speichert automatisch einen Screenshot bei jedem neuen Spielzustand."""
+        if self.last_screenshot is None:
+            return
+        import cv2 as _cv2, time as _time
+        hole = tuple(str(c) for c in game_state.get('hole_cards', []) if c)
+        board = tuple(str(c) for c in game_state.get('community_cards', []) if c)
+        street = str(game_state.get('street', '') or '')
+        sig = f"{hole}|{board}|{street}"
+        if sig == self._auto_capture_last_sig:
+            return
+        self._auto_capture_last_sig = sig
+        hole_str = ''.join(hole) if hole else 'XX'
+        board_str = ''.join(board) if board else 'PRE'
+        ts = int(_time.time())
+        fname = f"{self._auto_capture_dir}/{ts}_{hole_str}_{board_str}.png"
+        _cv2.imwrite(fname, self.last_screenshot)
+
+    def _format_cards_list(self, cards) -> str:
         valid_cards = [str(card) for card in cards if card]
         return " ".join(valid_cards) if valid_cards else "-"
 
@@ -69,6 +132,11 @@ class LivePokerAnalyzer:
         if board_count == 4:
             return 'turn'
         return 'river'
+
+    def _format_cards(self, cards) -> str:
+        if not cards:
+            return "-"
+        return " ".join(str(c) for c in cards)
 
     def _format_actions(self, actions) -> str:
         if not actions:
@@ -621,6 +689,26 @@ class LivePokerAnalyzer:
     def _sanitize_game_state(self, game_state: Dict[str, Any]) -> Dict[str, Any]:
         sanitized = dict(game_state)
         layout_name = getattr(self.table_parser, 'layout_name', '') or ''
+
+        # Entferne Board-Karten, die identisch zu einer Hero-Hole-Card sind (physikalisch unmöglich)
+        hole_cards = [card for card in sanitized.get('hole_cards', []) if card]
+        community_cards = [card for card in sanitized.get('community_cards', []) if card]
+        if hole_cards and community_cards:
+            hole_card_strs = {str(c) for c in hole_cards}
+            seen_board: set = set()
+            filtered_board = []
+            for card in community_cards:
+                card_str = str(card)
+                if card_str in hole_card_strs:
+                    logger.debug(f"Duplikat-Karte entfernt (auch in Hole Cards): {card_str}")
+                    continue
+                if card_str in seen_board:
+                    logger.debug(f"Doppelte Board-Karte entfernt: {card_str}")
+                    continue
+                seen_board.add(card_str)
+                filtered_board.append(card)
+            sanitized['community_cards'] = filtered_board
+
         available_actions = list(dict.fromkeys(sanitized.get('available_actions', [])))
         hero_stack = sanitized.get('hero_stack')
         villain_stack = sanitized.get('villain_stack')
@@ -724,7 +812,7 @@ class LivePokerAnalyzer:
             return False
         if not self._is_valid_board_count(community_cards):
             return False
-        if layout_name in {'heads_up', 'acipayam_heads_up'} and num_players_remaining < 2:
+        if layout_name in {'heads_up', 'acipayam_heads_up'} and 0 < num_players_remaining < 2:
             return False
 
         hero_stack = game_state.get('hero_stack')
@@ -959,7 +1047,13 @@ class LivePokerAnalyzer:
         while self.running and not self.stop_event.is_set():
             if not self.paused:
                 start_time = time.time()
-                game_state = self._get_game_state()
+                try:
+                    game_state = self._get_game_state()
+                except Exception as e:
+                    print(f"[BOT ERROR] Fehler beim Screenshot/Analyse: {e}", flush=True)
+                    logger.error(f"Fehler in analyze_loop: {e}", exc_info=True)
+                    time.sleep(1)
+                    continue
 
                 if game_state:
                     if not self._is_plausible_state(game_state):
@@ -974,12 +1068,10 @@ class LivePokerAnalyzer:
                     if state_signature != self.pending_state_signature:
                         self.pending_state_signature = state_signature
                         self.pending_state_count = 1
-                        if self.current_game_state and self.last_strategy and self.current_game_state.get('is_my_turn', False):
-                            self._print_live_summary(self.current_game_state, self.last_strategy)
-                        time.sleep(0.05)
-                        continue
+                        print(f"[BOT] Neuer Zustand erkannt: {state_signature[:3]}", flush=True)
+                    else:
+                        self.pending_state_count += 1
 
-                    self.pending_state_count += 1
                     required_frames = 1 if game_state.get('buttons_confirmed', False) else self.required_stable_frames
                     if self.pending_state_count < required_frames:
                         if self.current_game_state and self.last_strategy and self.current_game_state.get('is_my_turn', False):
@@ -1010,18 +1102,28 @@ class LivePokerAnalyzer:
                         self.pending_state_signature = None
                         self.pending_state_count = 0
 
+                        self._maybe_capture_screenshot(game_state)
+                        self._auto_capture_screenshot(game_state)
                         self.session_manager.record_analysis()
 
-                        strategy = self.strategy_engine.calculate_strategy(
-                            hole_cards=game_state['hole_cards'],
-                            community_cards=game_state['community_cards'],
-                            table_info=game_state
-                        )
+                        try:
+                            strategy = self.strategy_engine.calculate_strategy(
+                                hole_cards=game_state['hole_cards'],
+                                community_cards=game_state['community_cards'],
+                                table_info=game_state
+                            )
+                        except Exception as e:
+                            print(f"[BOT ERROR] Strategiefehler: {e}", flush=True)
+                            logger.error(f"Strategiefehler: {e}", exc_info=True)
+                            continue
                         self.last_strategy = strategy
                         self.session_manager.record_live_decision(game_state, strategy)
 
                         logger.debug(f"Strategie: {strategy}")
-                        self._print_live_summary(game_state, strategy)
+                        try:
+                            self._print_live_summary(game_state, strategy)
+                        except Exception as e:
+                            print(f"[BOT ERROR] Ausgabefehler: {e}", flush=True)
                         self._update_overlay(game_state, strategy)
 
                         if LIVE_CONFIG.get('voice_enabled', False) and self._is_actionable_spot(game_state):

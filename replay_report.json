@@ -1,0 +1,58 @@
+[
+  {
+    "file": "roi_debug\\Screenshot_27.png",
+    "hole_cards": [],
+    "community_cards": [],
+    "street": "preflop",
+    "pot_size": 0.0,
+    "to_call": 0.2,
+    "available_actions": [
+      "fold",
+      "call",
+      "raise"
+    ],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.0,
+    "reason": "missing_hole_cards",
+    "hand_category": null,
+    "board_texture": null,
+    "draws": {},
+    "elapsed_ms": 15575.86
+  },
+  {
+    "file": "roi_debug\\Screenshot_29.png",
+    "hole_cards": [
+      "QS",
+      "4S"
+    ],
+    "community_cards": [
+      "3C"
+    ],
+    "street": "preflop",
+    "pot_size": 0.0,
+    "to_call": 2.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.72,
+    "reason": "Preflop Q4s Score 0.51 | Zu schwach",
+    "hand_category": "preflop",
+    "board_texture": "preflop",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 25719.13
+  }
+]

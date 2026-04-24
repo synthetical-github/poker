@@ -1,0 +1,187 @@
+[
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\bnnj.png",
+    "hole_cards": [
+      "3C",
+      "TH"
+    ],
+    "community_cards": [
+      "JS",
+      "AC",
+      "AD"
+    ],
+    "street": "flop",
+    "pot_size": 0.11,
+    "to_call": 1.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.77,
+    "reason": "one_pair | strength=0.53 | equity=0.53 | pot_odds=0.90 | texture=dry_paired | insufficient_equity",
+    "hand_category": "one_pair",
+    "board_texture": "dry_paired",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 11804.92
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\er.png",
+    "hole_cards": [
+      "8S",
+      "TC"
+    ],
+    "community_cards": [
+      "QH",
+      "TC",
+      "9C",
+      "JC"
+    ],
+    "street": "turn",
+    "pot_size": 0.1,
+    "to_call": 2.0,
+    "available_actions": [],
+    "recommended_action": "call",
+    "amount": 0.0,
+    "confidence": 0.64,
+    "reason": "straight | strength=0.82 | equity=0.99 | pot_odds=0.95 | texture=wet | keep_range_wide",
+    "hand_category": "straight",
+    "board_texture": "wet",
+    "draws": {
+      "flush_draw": true,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": true,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": true,
+      "overcards": 0,
+      "combo_draw": true
+    },
+    "elapsed_ms": 12026.97
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\ertzhbgf.png",
+    "hole_cards": [
+      "QS",
+      "KH"
+    ],
+    "community_cards": [
+      "3S",
+      "2D",
+      "5C"
+    ],
+    "street": "flop",
+    "pot_size": 0.1,
+    "to_call": 0.1,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.67,
+    "reason": "high_card | strength=0.31 | equity=0.36 | pot_odds=0.10 | texture=dry | profitable_continue",
+    "hand_category": "high_card",
+    "board_texture": "dry",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": false,
+      "open_ended_straight_draw": false,
+      "gutshot": false,
+      "double_gutshot": false,
+      "pair_plus_draw": false,
+      "overcards": 2,
+      "combo_draw": false
+    },
+    "elapsed_ms": 11557.72
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\ghj.png",
+    "hole_cards": [
+      "4S",
+      "JD"
+    ],
+    "community_cards": [
+      "8H",
+      "QC",
+      "TC",
+      "JC"
+    ],
+    "street": "turn",
+    "pot_size": 0.1,
+    "to_call": 0.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "check",
+    "amount": 0.0,
+    "confidence": 0.97,
+    "reason": "one_pair | strength=0.54 | equity=0.73 | pot_odds=0.00 | texture=wet | pot_control",
+    "hand_category": "one_pair",
+    "board_texture": "wet",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": true,
+      "double_gutshot": false,
+      "pair_plus_draw": true,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 12937.98
+  },
+  {
+    "file": "C:\\Users\\user\\Desktop\\casino png 2\\ghjghjhgjhgj.png",
+    "hole_cards": [
+      "3C",
+      "TH"
+    ],
+    "community_cards": [
+      "JS",
+      "AC",
+      "TD",
+      "5H",
+      "QC"
+    ],
+    "street": "river",
+    "pot_size": 0.12,
+    "to_call": 1.0,
+    "available_actions": [
+      "fold",
+      "check",
+      "bet"
+    ],
+    "recommended_action": "fold",
+    "amount": 0.0,
+    "confidence": 0.62,
+    "reason": "one_pair | strength=0.56 | equity=0.75 | pot_odds=0.89 | texture=semi_wet | insufficient_equity",
+    "hand_category": "one_pair",
+    "board_texture": "semi_wet",
+    "draws": {
+      "flush_draw": false,
+      "backdoor_flush_draw": true,
+      "open_ended_straight_draw": false,
+      "gutshot": true,
+      "double_gutshot": false,
+      "pair_plus_draw": true,
+      "overcards": 0,
+      "combo_draw": false
+    },
+    "elapsed_ms": 11296.78
+  }
+]

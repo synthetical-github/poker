@@ -1540,7 +1540,9 @@ class CardDetector:
             left = max(0, int(w * 0.02))
             right = min(w, max(left + 1, int(w * 0.82)))
         else:
-            left = max(0, int(w * 0.22))
+            # Use 29% instead of 22% to reliably eliminate the red/orange selection
+            # indicator border that appears on the left edge of hero2 cards
+            left = max(0, int(w * 0.29))
             right = min(w, max(left + 1, int(w * 0.96)))
 
         cropped = roi_bgr[top:bottom, left:right]
@@ -1874,7 +1876,7 @@ class CardDetector:
 
             if context.startswith("board"):
                 board_accept = (
-                    rank_score >= 0.90
+                    (rank_score >= 0.90 or (rank_score >= 0.48 and rank_gap >= 0.15))
                     and suit_score >= self.min_corner_suit_match_threshold
                     and rank_gap >= 0.01
                     and suit_gap >= 0.01
@@ -2036,36 +2038,45 @@ class CardDetector:
         else:
             match_gray = roi_gray
 
+        # Fallback hero template match (score >= 0.80 but gap too small for immediate return)
+        _hero_fallback_name: Optional[str] = None
+        _hero_fallback_score: float = -1.0
+
         if self.layout_name == 'acipayam_heads_up' and card_surface is not None and card_surface.size > 0:
             if context.startswith("hero") and self.hero_card_templates:
                 hero_name, hero_score, hero_second, _ = self._get_card_template_stats_from_map(
                     match_gray,
                     self.hero_card_templates,
                 )
+                hero_gap = hero_score - hero_second
                 if (
                     hero_name
                     and hero_score >= 0.80
-                    and (hero_score - hero_second) >= 0.02
+                    and hero_gap >= 0.02
                 ):
                     card = parse_card_string(hero_name)
                     if card:
                         logger.debug(
                             f"Hero-Karte ueber Vollkarten-Templates erkannt: {card} "
-                            f"(Konfidenz: {hero_score:.2f}, Gap: {hero_score - hero_second:.2f})"
+                            f"(Konfidenz: {hero_score:.2f}, Gap: {hero_gap:.2f})"
                         )
                         self._store_cached_roi_result(cache_key, card)
                         return card
+                # Save as fallback for when gap is small but score is decent
+                if hero_name and hero_score >= 0.80:
+                    _hero_fallback_name = hero_name
+                    _hero_fallback_score = hero_score
             if context.startswith("board") and self.board_card_templates:
-                template_map = self.board_card_templates_by_context.get(context.lower()) or self.board_card_templates
+                # Use all board templates (not slot-specific) for complete coverage across positions
                 board_name, board_score, board_second, _ = self._get_card_template_stats_from_map(
                     match_gray,
-                    template_map,
+                    self.board_card_templates,
                 )
                 if (
                     board_name
                     and (
                         (board_score >= 0.98 and (board_score - board_second) >= 0.005)
-                        or (board_score >= 0.78 and (board_score - board_second) >= 0.02)
+                        or (board_score >= 0.74 and (board_score - board_second) >= 0.02)
                     )
                 ):
                     card = parse_card_string(board_name)
@@ -2091,6 +2102,34 @@ class CardDetector:
         if card_surface is not None and card_surface.size > 0:
             corner_card = self._detect_card_from_corner(card_surface, context=context)
             if corner_card:
+                # For hero cards in acipayam: if hero template had a decent score
+                # but corner detection disagrees, use suit to disambiguate:
+                # - Same suit but different rank → trust corner (corner rank is reliable)
+                # - Different suit → trust hero template (corner suit detection is error-prone)
+                if (
+                    _hero_fallback_name
+                    and self.layout_name == 'acipayam_heads_up'
+                    and context.startswith("hero")
+                    and str(corner_card) != _hero_fallback_name
+                ):
+                    corner_suit = str(corner_card)[1] if len(str(corner_card)) == 2 else ""
+                    fallback_suit = _hero_fallback_name[1] if len(_hero_fallback_name) == 2 else ""
+                    if corner_suit != fallback_suit:
+                        # Suit disagreement → hero template is more reliable for suit
+                        fallback_card = parse_card_string(_hero_fallback_name)
+                        if fallback_card:
+                            logger.debug(
+                                f"Hero-Karte: corner={corner_card}(suit={corner_suit}) vs "
+                                f"hero-template={_hero_fallback_name}(suit={fallback_suit}) – "
+                                f"Suit-Konflikt, waehle hero-template"
+                            )
+                            self._store_cached_roi_result(cache_key, fallback_card)
+                            return fallback_card
+                    # Same suit but different rank → trust corner's rank detection
+                    logger.debug(
+                        f"Hero-Karte: corner={corner_card} und hero-template={_hero_fallback_name} "
+                        f"gleicher Suit, corner-Rang bevorzugt"
+                    )
                 self._store_cached_roi_result(cache_key, corner_card)
                 return corner_card
 
@@ -2110,6 +2149,15 @@ class CardDetector:
                 return card
 
         if self.layout_name == 'acipayam_heads_up':
+            # Use hero fallback if generic templates also failed
+            if _hero_fallback_name:
+                fallback_card = parse_card_string(_hero_fallback_name)
+                if fallback_card:
+                    logger.debug(
+                        f"Hero-Karte letzter Fallback: {fallback_card} (score={_hero_fallback_score:.2f})"
+                    )
+                    self._store_cached_roi_result(cache_key, fallback_card)
+                    return fallback_card
             self._store_cached_roi_result(cache_key, None)
             return None
 

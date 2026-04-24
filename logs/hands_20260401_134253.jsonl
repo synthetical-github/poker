@@ -1,0 +1,1 @@
+{"hand_id": "test", "initial_hero_stack": 6.9, "final_hero_stack": 6.6, "hero_stack_delta": -0.3, "outcome": "lost", "outcome_source": "next_hand_stack", "snapshots": [{"pot_size": 0.15, "to_call": 0.05}], "recommendations": [], "finished_at": 1775043773.9215052}
