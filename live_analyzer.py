@@ -1065,6 +1065,15 @@ class LivePokerAnalyzer:
 
                     state_signature = self._build_state_signature(game_state)
 
+                    # Neue Community-Karte erkannt → Strategie-Cache zurücksetzen
+                    _new_board_count = len([c for c in game_state.get('community_cards', []) if c])
+                    _prev_board_count = len([c for c in (self.current_game_state or {}).get('community_cards', []) if c])
+                    if _new_board_count > _prev_board_count:
+                        logger.info(f"[BOT] Neue Boardkarte erkannt ({_prev_board_count}→{_new_board_count}). Strategie-Cache zurückgesetzt.")
+                        self.last_strategy = None
+                        self.last_state_signature = None
+                        self.last_summary_output = ""
+
                     if state_signature != self.pending_state_signature:
                         self.pending_state_signature = state_signature
                         self.pending_state_count = 1

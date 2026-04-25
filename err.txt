@@ -1,0 +1,16 @@
+Window-Capture aktiv. Suche App-Fenster mit Titel passend zu: NL Hold'em
+
+--- Hotkeys ---
+- f2: Manual Fold
+- f3: Manual Call
+- f4: Manual Raise (Amount needs definition)
+- f5: Calibrate ROIs
+- f6: Toggle Pause
+- f7: Toggle Voice Announcer
+- f8: Toggle Overlay
+- f9: Screenshot-Aufnahme 2 Runden
+- ctrl+q: Stop Bot
+---------------
+
+[BOT] Neuer Zustand erkannt: (('2S', '5H'), ('TS', 'KS', '5S', 'JS'), 0.2)
+TURN | 2S 5H | BOARD TS KS 5S JS | NEXT: WARTEN | EQ 50.4% | V balanced | RANGE AQo QQ AA A9o | Spot nicht bestaetigt

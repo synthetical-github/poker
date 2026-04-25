@@ -999,7 +999,7 @@ class CardDetector:
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
         
         if max_val >= self.min_card_match_threshold:
-            return max_loc[0], max_loc[1], max_val # x, y, confidence
+            return max_loc[0], max_loc[1], max_val  # x, y, confidence
         return None
 
     def _score_card_template(self, card_gray: np.ndarray, template: np.ndarray) -> float:
@@ -1533,19 +1533,19 @@ class CardDetector:
             return None
 
         h, w = roi_bgr.shape[:2]
-        top = max(1, int(h * 0.02))
-        bottom = max(top + 1, h - max(1, int(h * 0.04)))
+        y_start = max(1, int(h * 0.02))
+        y_end = max(y_start + 1, h - max(1, int(h * 0.04)))
 
         if context == "hero1":
-            left = max(0, int(w * 0.02))
-            right = min(w, max(left + 1, int(w * 0.82)))
+            x_start = max(0, int(w * 0.02))
+            x_end = min(w, max(x_start + 1, int(w * 0.82)))
         else:
             # Use 29% instead of 22% to reliably eliminate the red/orange selection
             # indicator border that appears on the left edge of hero2 cards
-            left = max(0, int(w * 0.29))
-            right = min(w, max(left + 1, int(w * 0.96)))
+            x_start = max(0, int(w * 0.29))
+            x_end = min(w, max(x_start + 1, int(w * 0.96)))
 
-        cropped = roi_bgr[top:bottom, left:right]
+        cropped = roi_bgr[y_start:y_end, x_start:x_end]
         if cropped.size == 0:
             return roi_bgr
         if self.layout_name == "acipayam_heads_up":
@@ -1863,7 +1863,7 @@ class CardDetector:
 
             if context.startswith("hero"):
                 hero_accept = (
-                    rank_score >= 0.95
+                    rank_score >= 0.85
                     and suit_score >= self.min_corner_suit_match_threshold
                     and rank_gap >= 0.01
                     and suit_gap >= 0.01
@@ -2063,7 +2063,7 @@ class CardDetector:
                         self._store_cached_roi_result(cache_key, card)
                         return card
                 # Save as fallback for when gap is small but score is decent
-                if hero_name and hero_score >= 0.80:
+                if hero_name and hero_score >= 0.77:
                     _hero_fallback_name = hero_name
                     _hero_fallback_score = hero_score
             if context.startswith("board") and self.board_card_templates:
@@ -2169,25 +2169,26 @@ class CardDetector:
 
         # Letzter Fallback: OCR auf der gesamten ROI
         try:
-            config = '--psm 10' # Annahme: einzelne Zeichen
+            config = '--psm 10'  # Annahme: einzelne Zeichen
             text = pytesseract.image_to_string(roi_gray, config=config)
             cleaned_text = ''.join(filter(str.isalnum, text)).upper()
-            
+
             # Einfache Heuristik: Suche nach Rang+Farbe Kombinationen
             possible_cards = []
             for rank in self.ranks:
-                 for suit in self.suits:
-                      card_str = f"{rank}{suit}"
-                      if card_str in cleaned_text:
-                           parsed_card = parse_card_string(card_str)
-                           if parsed_card: possible_cards.append(parsed_card)
+                for suit in self.suits:
+                    card_str = f"{rank}{suit}"
+                    if card_str in cleaned_text:
+                        parsed_card = parse_card_string(card_str)
+                        if parsed_card:
+                            possible_cards.append(parsed_card)
 
             if possible_cards:
-                 logger.debug(f"OCR Fallback fand Karten: {possible_cards}")
-                 # Gib die erste gefundene Karte zurück (oder eine robustere Auswahl)
-                 self._store_cached_roi_result(cache_key, possible_cards[0])
-                 return possible_cards[0]
-                 
+                logger.debug(f"OCR Fallback fand Karten: {possible_cards}")
+                # Gib die erste gefundene Karte zurück (oder eine robustere Auswahl)
+                self._store_cached_roi_result(cache_key, possible_cards[0])
+                return possible_cards[0]
+
         except Exception as e:
             logger.warning(f"OCR Fallback für Karten fehlgeschlagen: {e}")
 
@@ -2204,7 +2205,7 @@ class CardDetector:
         detected_cards = []
         for i, region in enumerate(regions):
             x, y, w, h = region
-            if w <= 0 or h <= 0: 
+            if w <= 0 or h <= 0:
                 detected_cards.append(None)
                 continue
 
@@ -2216,13 +2217,13 @@ class CardDetector:
             h = min(h, img_h - y)
 
             if w <= 0 or h <= 0:
-                 detected_cards.append(None)
-                 continue
+                detected_cards.append(None)
+                continue
 
             roi = screenshot_bgr[y:y+h, x:x+w]
             card = self._process_card_roi(roi, context=context)
             detected_cards.append(card)
-            
+
         return detected_cards
 
     def _scale_fixed_region(

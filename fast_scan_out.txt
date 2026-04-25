@@ -1,0 +1,100 @@
+=== Hero Results per Screenshot ===
+  SS_01: AD               ?(2C:0.95,gap:0.02)
+  SS_02: ?(7C:0.87,gap:0.00)  ?(3C:0.89,gap:0.00)
+  SS_03: 7H               ?(6S:0.83,gap:0.00)
+  SS_04: ?(6H:0.91,gap:0.01)  6S             
+  SS_05: 5H               2C             
+  SS_06: 5H               ?(3C:0.97,gap:0.00)
+  SS_07: ?(7C:0.90,gap:0.01)  KD             
+  SS_08: 5H               ?(KD:0.80,gap:0.01)
+  SS_09: 9S               2C             
+  SS_10: 9S               ?(3C:0.96,gap:0.00)
+  SS_11: ?(TD:0.90,gap:0.01)  6S             
+  SS_12: ?(KC:0.91,gap:0.00)  ?(4C:0.79,gap:0.00)
+  SS_13: TC               ?(4C:0.90,gap:0.01)
+  SS_14: ?(6H:0.92,gap:0.01)  4C             
+  SS_15: KC               6S             
+  SS_16: ?(7C:0.93,gap:0.00)  4C             
+  SS_17: 4H               2C             
+  SS_18: ?(4H:0.94,gap:0.01)  2C             
+  SS_19: 5H               3C             
+  SS_20: 6S               ?(4C:0.91,gap:0.02)
+  SS_21: 6S               ?(4C:0.92,gap:0.01)
+  SS_22: ?(7C:0.91,gap:0.00)  3C             
+  SS_23: ?(7C:0.86,gap:0.00)  7D             
+  SS_24: 5C               7D             
+  SS_25: KC               ?(6S:0.88,gap:0.01)
+  SS_26: ?(7C:0.90,gap:0.01)  ?(4C:0.88,gap:0.01)
+  SS_27: TC               ?(4C:0.87,gap:0.02)
+  SS_28: KC               3C             
+  SS_29: 7C               ?(4C:0.92,gap:0.02)
+  SS_30: 5C               7D             
+  SS_31: 6S               ?(3C:0.90,gap:0.02)
+  SS_32: 6S               ?(3C:0.90,gap:0.02)
+  SS_33: 6C               ?(2C:0.89,gap:0.01)
+  SS_34: 9S               2C             
+  SS_35: 9S               2C             
+  SS_36: ?(6C:0.96,gap:0.01)  2C             
+  SS_37: JS               ?(4C:0.88,gap:0.01)
+  SS_38: QS               3C             
+  SS_39: QS               3C             
+  SS_40: KC               7D             
+  SS_41: ?(7C:0.87,gap:0.00)  6S             
+  SS_42: 5C               ?(3H:0.89,gap:0.00)
+  SS_43: AD               7D             
+  SS_44: 5C               ?(7D:0.89,gap:0.00)
+  SS_45: ?(4H:0.93,gap:0.02)  3C             
+  SS_46: TC               2C             
+  SS_47: 6H               3C             
+  SS_48: ?(TC:0.89,gap:0.02)  ?(4C:0.94,gap:0.01)
+  SS_49: ?(6C:0.93,gap:0.00)  ?(2C:0.92,gap:0.01)
+  SS_50: ?(6C:0.96,gap:0.01)  ?(2C:0.91,gap:0.00)
+  SS_51: ?(JS:0.89,gap:0.02)  ?(2C:0.85,gap:0.00)
+  SS_52: 5C               ?(KD:0.82,gap:0.00)
+
+=== Not recognized (score<0.80 or gap<0.02) ===
+  SS_01 hero2: best=2C score=0.946 gap=0.016
+  SS_02 hero1: best=7C score=0.868 gap=0.005
+  SS_02 hero2: best=3C score=0.887 gap=0.003
+  SS_03 hero2: best=6S score=0.833 gap=0.002
+  SS_04 hero1: best=6H score=0.911 gap=0.014
+  SS_06 hero2: best=3C score=0.972 gap=0.001
+  SS_07 hero1: best=7C score=0.895 gap=0.008
+  SS_08 hero2: best=KD score=0.799 gap=0.007
+  SS_10 hero2: best=3C score=0.956 gap=0.002
+  SS_11 hero1: best=TD score=0.895 gap=0.012
+  SS_12 hero1: best=KC score=0.913 gap=0.001
+  SS_12 hero2: best=4C score=0.789 gap=0.004
+  SS_13 hero2: best=4C score=0.896 gap=0.009
+  SS_14 hero1: best=6H score=0.920 gap=0.013
+  SS_16 hero1: best=7C score=0.929 gap=0.002
+  SS_18 hero1: best=4H score=0.939 gap=0.006
+  SS_20 hero2: best=4C score=0.912 gap=0.015
+  SS_21 hero2: best=4C score=0.916 gap=0.011
+  SS_22 hero1: best=7C score=0.905 gap=0.002
+  SS_23 hero1: best=7C score=0.861 gap=0.001
+  SS_25 hero2: best=6S score=0.880 gap=0.009
+  SS_26 hero1: best=7C score=0.900 gap=0.007
+  SS_26 hero2: best=4C score=0.882 gap=0.012
+  SS_27 hero2: best=4C score=0.868 gap=0.018
+  SS_29 hero2: best=4C score=0.925 gap=0.019
+  SS_31 hero2: best=3C score=0.898 gap=0.019
+  SS_32 hero2: best=3C score=0.903 gap=0.017
+  SS_33 hero2: best=2C score=0.886 gap=0.014
+  SS_36 hero1: best=6C score=0.959 gap=0.010
+  SS_37 hero2: best=4C score=0.880 gap=0.010
+  SS_41 hero1: best=7C score=0.874 gap=0.001
+  SS_42 hero2: best=3H score=0.894 gap=0.003
+  SS_44 hero2: best=7D score=0.887 gap=0.004
+  SS_45 hero1: best=4H score=0.933 gap=0.016
+  SS_48 hero1: best=TC score=0.893 gap=0.017
+  SS_48 hero2: best=4C score=0.942 gap=0.011
+  SS_49 hero1: best=6C score=0.925 gap=0.004
+  SS_49 hero2: best=2C score=0.915 gap=0.011
+  SS_50 hero1: best=6C score=0.956 gap=0.009
+  SS_50 hero2: best=2C score=0.910 gap=0.001
+  SS_51 hero1: best=JS score=0.885 gap=0.019
+  SS_51 hero2: best=2C score=0.854 gap=0.002
+  SS_52 hero2: best=KD score=0.817 gap=0.001
+
+=== Coverage: Counter({'2C': 8, '6S': 8, '3C': 7, '5C': 5, '7D': 5, '5H': 4, '9S': 4, 'KC': 4, 'TC': 3, '4C': 2, 'AD': 2, 'QS': 2, '4H': 1, '6C': 1, '6H': 1, '7C': 1, '7H': 1, 'JS': 1, 'KD': 1}) ===
