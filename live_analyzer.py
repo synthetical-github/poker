@@ -61,7 +61,8 @@ class LivePokerAnalyzer:
         # Auto-Screenshot bei jedem neuen Spielzustand
         self._auto_capture_last_sig: str = ""
         self._auto_capture_dir = 'auto_screenshots'
-        import os as _os; _os.makedirs(self._auto_capture_dir, exist_ok=True)
+        import os as _os
+        _os.makedirs(self._auto_capture_dir, exist_ok=True)
 
         self.overlay = OverlayWindow()
         if LIVE_CONFIG.get('show_overlay', True):
@@ -83,7 +84,8 @@ class LivePokerAnalyzer:
             return
         if self.last_screenshot is None:
             return
-        import cv2, os, time as _time
+        import cv2
+        import time as _time
 
         # Neue Runde erkennen: Hole Cards haben sich geändert (neue Hand)
         current_hole = tuple(str(c) for c in game_state.get('hole_cards', []) if c)
@@ -91,9 +93,16 @@ class LivePokerAnalyzer:
             if self._capture_last_hole:  # Nicht beim allerersten Frame
                 self._capture_round_count += 1
                 print(f"[BOT] Runde {self._capture_round_count} abgeschlossen.", flush=True)
-                if self._capture_round_count >= self._capture_rounds_remaining + (1 if self._capture_last_hole == () else 0):
+                if self._capture_round_count >= self._capture_rounds_remaining + (
+                    1 if self._capture_last_hole == () else 0
+                ):
                     self._capture_rounds_remaining = 0
-                    print(f"[BOT] Screenshot-Aufnahme beendet. {self._capture_frame_index} Frames gespeichert in capture_rounds/", flush=True)
+                    frames = self._capture_frame_index
+                    print(
+                        f"[BOT] Screenshot-Aufnahme beendet. {frames} Frames"
+                        " gespeichert in capture_rounds/",
+                        flush=True,
+                    )
                     return
             self._capture_last_hole = current_hole
 
@@ -106,7 +115,8 @@ class LivePokerAnalyzer:
         """Speichert automatisch einen Screenshot bei jedem neuen Spielzustand."""
         if self.last_screenshot is None:
             return
-        import cv2 as _cv2, time as _time
+        import cv2 as _cv2
+        import time as _time
         hole = tuple(str(c) for c in game_state.get('hole_cards', []) if c)
         board = tuple(str(c) for c in game_state.get('community_cards', []) if c)
         street = str(game_state.get('street', '') or '')
@@ -282,7 +292,9 @@ class LivePokerAnalyzer:
             f"Status: {'AM ZUG' if actionable_spot else 'WARTEN'} | Next: {next_move if actionable_spot else 'Beobachten'}",
             f"Pot {pot_size:.2f} | To Call {to_call:.2f} | Actions {available_actions} | My Turn {is_my_turn}",
             f"Hand {hand_category} | Texture {board_texture} | Draws {draw_text}",
-            f"Equity hand {self._format_percent(hand_equity)} | range {self._format_percent(range_equity)} | odds {self._format_percent(pot_odds)}",
+            f"Equity hand {self._format_percent(hand_equity)}"
+            f" | range {self._format_percent(range_equity)}"
+            f" | odds {self._format_percent(pot_odds)}",
             f"Villain {opponent_style} | Range {range_label}",
             f"Solver {solver_text} | Policy {policy_source} | Parser {parser_confidence:.2f}",
             f"Why: {reason}",
@@ -1069,7 +1081,11 @@ class LivePokerAnalyzer:
                     _new_board_count = len([c for c in game_state.get('community_cards', []) if c])
                     _prev_board_count = len([c for c in (self.current_game_state or {}).get('community_cards', []) if c])
                     if _new_board_count > _prev_board_count:
-                        logger.info(f"[BOT] Neue Boardkarte erkannt ({_prev_board_count}→{_new_board_count}). Strategie-Cache zurückgesetzt.")
+                        logger.info(
+                            f"[BOT] Neue Boardkarte erkannt"
+                            f" ({_prev_board_count}→{_new_board_count})."
+                            " Strategie-Cache zurückgesetzt."
+                        )
                         self.last_strategy = None
                         self.last_state_signature = None
                         self.last_summary_output = ""
@@ -1146,6 +1162,24 @@ class LivePokerAnalyzer:
                         if not self.headless and LIVE_CONFIG.get('show_debug_window', False) and self.last_screenshot is not None:
                             self._display_debug_image(self.last_screenshot, game_state, strategy)
 
+                        # Auto-execute when auto_mode is enabled and it's our confirmed turn
+                        if (
+                            self.auto_mode
+                            and self._is_actionable_spot(game_state)
+                            and game_state.get('buttons_confirmed', False)
+                            and self.last_action_taken != str(state_signature)
+                        ):
+                            rec_action = str(strategy.get('recommended_action', '')).lower()
+                            rec_amount = float(strategy.get('amount', 0.0) or 0.0)
+                            if rec_action in ('fold', 'call', 'check', 'bet', 'raise'):
+                                logger.info(f"[AUTO] Führe aus: {rec_action.upper()} {rec_amount:.2f}")
+                                print(f"[AUTO] {rec_action.upper()} {rec_amount:.2f}", flush=True)
+                                try:
+                                    self.execute_action(rec_action, rec_amount)
+                                    self.last_action_taken = str(state_signature)
+                                except Exception as e:
+                                    logger.error(f"[AUTO] Fehler bei Ausführung: {e}")
+
                     elif self.current_game_state and self.last_strategy:
                         self._print_live_summary(self.current_game_state, self.last_strategy)
 
@@ -1179,7 +1213,10 @@ class LivePokerAnalyzer:
         cards_str = f"Hole: {game_state.get('hole_cards', ['?','?'])} Board: {game_state.get('community_cards', [])}"
         cv2.putText(img_vis, cards_str, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 1)
 
-        pot_info = f"Pot: {game_state.get('pot_size', 0):.0f} ToCall: {game_state.get('to_call', 0):.0f} Pos: {game_state.get('position', '?')}"
+        pot = game_state.get('pot_size', 0)
+        to_call = game_state.get('to_call', 0)
+        pos = game_state.get('position', '?')
+        pot_info = f"Pot: {pot:.0f} ToCall: {to_call:.0f} Pos: {pos}"
         cv2.putText(img_vis, pot_info, (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 1)
 
         cv2.imshow("Poker Bot Live Analysis", img_vis)
@@ -1204,20 +1241,37 @@ class LivePokerAnalyzer:
 
     def calibrate_rois(self):
         logger.info("Starte Kalibrierung der Regions of Interest...")
-        print("Bitte wählen Sie nun den Bereich für den Spieltisch aus.")
-        selected_region = select_region_interactive()
-        if selected_region:
-            LIVE_CONFIG['screen_region'] = selected_region
-            logger.info(f"Bildschirmregion aktualisiert auf: {selected_region}")
-            print(f"Bildschirmregion aktualisiert auf: {selected_region}. Bitte speichern Sie diese in config.py.")
+        capture_method = str(LIVE_CONFIG.get('capture_method', 'window')).strip().lower()
+
+        if capture_method == 'window':
+            # Im Window-Modus: Fenster-Cache zurücksetzen und neu suchen
+            from utils.screen_utils import get_screenshot_for_processing
+            LIVE_CONFIG.pop('detected_window_title', None)
+            print("[Kalibrierung] Window-Modus: Suche Pokerfenster neu...", flush=True)
+            screenshot = get_screenshot_for_processing()
+            if screenshot is not None:
+                title = LIVE_CONFIG.get('detected_window_title', '(unbekannt)')
+                print(f"[Kalibrierung] Fenster gefunden: {title}", flush=True)
+                logger.info(f"Fenster neu erkannt: {title}")
+            else:
+                print("[Kalibrierung] Kein Fenster gefunden. Sicherstellen dass das Spiel läuft.", flush=True)
+                logger.warning("Fenster-Kalibrierung fehlgeschlagen: kein Fenster gefunden.")
         else:
-            logger.warning("Kalibrierung abgebrochen oder keine Region ausgewählt.")
-            print("Kalibrierung abgebrochen.")
+            # Im Screen-Modus: interaktive Regionsauswahl per Screenshot
+            print("Bitte wählen Sie nun den Bereich für den Spieltisch aus.", flush=True)
+            selected_region = select_region_interactive()
+            if selected_region:
+                LIVE_CONFIG['screen_region'] = selected_region
+                logger.info(f"Bildschirmregion aktualisiert auf: {selected_region}")
+                print(f"Bildschirmregion aktualisiert auf: {selected_region}. Bitte speichern Sie diese in config.py.")
+            else:
+                logger.warning("Kalibrierung abgebrochen oder keine Region ausgewählt.")
+                print("Kalibrierung abgebrochen.")
 
     def toggle_auto_mode(self):
-        self.auto_mode = False
-        logger.info("Auto-Modus bleibt deaktiviert.")
-        print("--- Auto-Modus ist deaktiviert ---")
+        self.auto_mode = not self.auto_mode
+        logger.info(f"Auto-Modus {'aktiviert' if self.auto_mode else 'deaktiviert'}.")
+        print(f"--- Auto-Modus {'AN' if self.auto_mode else 'AUS'} ---")
 
     def toggle_pause(self):
         self.paused = not self.paused

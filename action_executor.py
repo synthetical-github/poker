@@ -9,11 +9,18 @@ import cv2
 import numpy as np
 import pyautogui
 import pytesseract
+try:
+    import os as _os_tess
+    _tess_path = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    if _os_tess.path.exists(_tess_path):
+        pytesseract.pytesseract.tesseract_cmd = _tess_path
+except Exception:
+    pass
 
 from utils.logger import logger
 from utils.config import LIVE_CONFIG
-from utils.card_utils import Card # Nur für Typ-Hinweise
 from config import get_current_table_layout_name, get_table_action_rois
+
 
 class ActionExecutor:
     def __init__(self):
@@ -35,11 +42,11 @@ class ActionExecutor:
                 screen_height = pyautogui.size().height
                 self.screen_region = (0, 0, screen_width, screen_height)
             except Exception as e:
-                 logger.error(f"Konnte Bildschirmgröße nicht ermitteln: {e}")
-                 self.screen_region = (0, 0, 100, 100) # Minimaler Fallback
+                logger.error(f"Konnte Bildschirmgröße nicht ermitteln: {e}")
+                self.screen_region = (0, 0, 100, 100)  # Minimaler Fallback
 
         self._refresh_layout()
-        self.button_coords = self._load_button_coordinates() # Laden von Button-Positionen (MUSS ANGEPASST WERDEN!)
+        self.button_coords = self._load_button_coordinates()  # Laden von Button-Positionen
 
     def _refresh_layout(self):
         layout_name = get_current_table_layout_name()
@@ -60,7 +67,7 @@ class ActionExecutor:
             'check': self._center_of_region(button_regions['check_button']),
             'bet_input_field': self._center_of_region(button_regions['bet_input_field']),
         }
-                  
+
         logger.debug(f"Geladene Button-Koordinaten: {coords}")
         return coords
 
@@ -427,7 +434,6 @@ class ActionExecutor:
             )
         detected['button_text']['bet_input_field'] = " | ".join(input_texts)
 
-        fold_text = detected['button_text'].get('fold_button', '')
         middle_text = detected['button_text'].get('check_button', '')
         right_text = detected['button_text'].get('bet_button', '')
         input_text = detected['button_text'].get('bet_input_field', '')
@@ -456,13 +462,13 @@ class ActionExecutor:
             detected['available_actions'].append('raise')
             detected['raise_to_amount'] = self._parse_button_amount(right_text)
         elif right_button_present:
-            if inferred_right_amount > 0 or detected['bet_input_amount'] > 0:
-                if detected['call_amount'] > 0 or middle_keyword == 'CALL':
-                    detected['available_actions'].append('raise')
-                    detected['raise_to_amount'] = inferred_right_amount or detected['bet_input_amount']
-                else:
-                    detected['available_actions'].append('bet')
-                    detected['raise_to_amount'] = inferred_right_amount or detected['bet_input_amount']
+            # Always register the right button as bet/raise even when OCR yields no amount
+            if detected['call_amount'] > 0 or middle_keyword == 'CALL':
+                detected['available_actions'].append('raise')
+                detected['raise_to_amount'] = inferred_right_amount or detected['bet_input_amount']
+            else:
+                detected['available_actions'].append('bet')
+                detected['raise_to_amount'] = inferred_right_amount or detected['bet_input_amount']
 
         detected['bet_input_amount'] = self._parse_button_amount(input_text)
         if detected['bet_input_amount'] > 0:
@@ -475,17 +481,19 @@ class ActionExecutor:
                     detected['call_amount'] = round(detected['bet_input_amount'] / 2.0, 2)
 
         # Fallbacks when OCR saw the buttons but missed the exact label.
-        if 'fold' in detected['available_actions'] and 'check' not in detected['available_actions'] and 'call' not in detected['available_actions'] and middle_button_present:
+        no_middle = 'check' not in detected['available_actions'] and 'call' not in detected['available_actions']
+        if 'fold' in detected['available_actions'] and no_middle and middle_button_present:
             if inferred_middle_amount > 0:
                 detected['available_actions'].append('call')
                 detected['call_amount'] = inferred_middle_amount
             else:
                 detected['available_actions'].append('check')
-        if 'fold' in detected['available_actions'] and 'bet' not in detected['available_actions'] and 'raise' not in detected['available_actions'] and right_button_present:
+        no_right = 'bet' not in detected['available_actions'] and 'raise' not in detected['available_actions']
+        if 'fold' in detected['available_actions'] and no_right and right_button_present:
             if detected['call_amount'] > 0:
                 detected['available_actions'].append('raise')
                 detected['raise_to_amount'] = inferred_right_amount or detected['bet_input_amount']
-            elif inferred_right_amount > 0 or detected['bet_input_amount'] > 0:
+            else:
                 detected['available_actions'].append('bet')
                 detected['raise_to_amount'] = inferred_right_amount or detected['bet_input_amount']
 
@@ -504,6 +512,9 @@ class ActionExecutor:
             ('check', 'fold', 'raise'),
             ('call', 'fold', 'raise'),
             ('bet', 'call', 'fold'),
+            # 2-button scenarios (e.g. all-in or short-stack)
+            ('check', 'fold'),
+            ('call', 'fold'),
         }
         detected['buttons_confirmed'] = tuple(sorted(detected['available_actions'])) in valid_action_sets
         self._last_action_fingerprint = fingerprint
@@ -516,7 +527,7 @@ class ActionExecutor:
             pyautogui.moveTo(coords[0], coords[1], duration=duration)
             pyautogui.click()
             logger.debug(f"Geklickt auf: {coords}")
-            time.sleep(0.1) # Kleine Pause nach dem Klick
+            time.sleep(0.1)  # Kleine Pause nach dem Klick
         except Exception as e:
             logger.error(f"Fehler bei Mausbewegung/Klick auf {coords}: {e}")
 
@@ -525,19 +536,19 @@ class ActionExecutor:
         try:
             coord = self.button_coords.get('bet_input_field')
             if not coord:
-                 logger.error("Koordinaten für 'bet_input_field' nicht definiert.")
-                 return
-                 
+                logger.error("Koordinaten für 'bet_input_field' nicht definiert.")
+                return
+
             # Klicke zuerst ins Feld, um sicherzustellen, dass es aktiv ist
             self._move_and_click(coord, duration=0.1)
-            
+
             # Lösche den aktuellen Inhalt (z.B. durch Strg+A, Entf)
             pyautogui.hotkey('ctrl', 'a')
             pyautogui.press('delete')
             time.sleep(0.1)
-            
+
             # Gib den neuen Betrag ein
-            amount_str = str(int(round(amount))) # Runde auf ganze Zahlen, da oft ganze Chips gesetzt werden
+            amount_str = str(int(round(amount)))  # Runde auf ganze Zahlen
             pyautogui.write(amount_str, interval=0.05)
             logger.debug(f"Betrag eingegeben: {amount_str}")
             time.sleep(0.1)
@@ -552,40 +563,50 @@ class ActionExecutor:
 
         if action == 'fold':
             coord = self.button_coords.get('fold')
-            if coord: self._move_and_click(coord)
-            else: logger.warning("Keine Koordinaten für 'fold' gefunden.")
-        
+            if coord:
+                self._move_and_click(coord)
+            else:
+                logger.warning("Keine Koordinaten für 'fold' gefunden.")
+
         elif action == 'call':
             coord = self.button_coords.get('call')
-            if coord: self._move_and_click(coord)
-            else: logger.warning("Keine Koordinaten für 'call' gefunden.")
+            if coord:
+                self._move_and_click(coord)
+            else:
+                logger.warning("Keine Koordinaten für 'call' gefunden.")
 
         elif action == 'check':
-            coord = self.button_coords.get('check') # Annahme: Check ist oft der gleiche Button wie Fold
-            if coord: self._move_and_click(coord)
-            else: logger.warning("Keine Koordinaten für 'check' gefunden.")
+            coord = self.button_coords.get('check')  # Check-Button
+            if coord:
+                self._move_and_click(coord)
+            else:
+                logger.warning("Keine Koordinaten für 'check' gefunden.")
 
         elif action == 'bet':
             # Setze den Betrag und klicke dann auf den Bet/Raise Button
             if amount > 0:
                 self._type_amount(amount)
-                coord = self.button_coords.get('bet') # Oder 'raise'
-                if coord: self._move_and_click(coord)
-                else: logger.warning("Keine Koordinaten für 'bet' gefunden.")
+                coord = self.button_coords.get('bet')  # Oder 'raise'
+                if coord:
+                    self._move_and_click(coord)
+                else:
+                    logger.warning("Keine Koordinaten für 'bet' gefunden.")
             else:
-                 logger.warning("Aktion 'bet' gewählt, aber Betrag ist 0. Führe 'check' aus.")
-                 self.execute_action('check')
+                logger.warning("Aktion 'bet' gewählt, aber Betrag ist 0. Führe 'check' aus.")
+                self.execute_action('check')
 
         elif action == 'raise':
             # Setze den Betrag und klicke dann auf den Raise Button
             if amount > 0:
                 self._type_amount(amount)
                 coord = self.button_coords.get('raise')
-                if coord: self._move_and_click(coord)
-                else: logger.warning("Keine Koordinaten für 'raise' gefunden.")
+                if coord:
+                    self._move_and_click(coord)
+                else:
+                    logger.warning("Keine Koordinaten für 'raise' gefunden.")
             else:
-                 logger.warning("Aktion 'raise' gewählt, aber Betrag ist 0. Führe 'call' aus.")
-                 self.execute_action('call')
-        
+                logger.warning("Aktion 'raise' gewählt, aber Betrag ist 0. Führe 'call' aus.")
+                self.execute_action('call')
+
         else:
             logger.warning(f"Unbekannte Aktion: {action}")

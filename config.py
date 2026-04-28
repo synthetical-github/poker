@@ -188,6 +188,7 @@ TABLE_ACTION_LAYOUTS = {
     },
 }
 
+
 def get_current_table_layout_name(window_title: str = "") -> str:
     configured_layout = LIVE_CONFIG.get('table_layout', 'auto')
     if configured_layout and configured_layout != 'auto':
@@ -200,13 +201,16 @@ def get_current_table_layout_name(window_title: str = "") -> str:
 
     return LIVE_CONFIG.get('default_table_layout', 'ring')
 
+
 def get_table_rois(layout_name: str = None):
     layout_name = layout_name or get_current_table_layout_name()
     return TABLE_LAYOUTS.get(layout_name, TABLE_LAYOUTS[LIVE_CONFIG.get('default_table_layout', 'ring')])
 
+
 def get_table_action_rois(layout_name: str = None):
     layout_name = layout_name or get_current_table_layout_name()
     return TABLE_ACTION_LAYOUTS.get(layout_name, TABLE_ACTION_LAYOUTS[LIVE_CONFIG.get('default_table_layout', 'ring')])
+
 
 TABLE_ROIS = get_table_rois()
 TABLE_ACTION_ROIS = get_table_action_rois()
