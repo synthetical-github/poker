@@ -1121,6 +1121,16 @@ class CardDetector:
                 cards.append(None)
                 continue
             roi = screenshot_bgr[y:y+h, x:x+w]
+            # Karte nur erkennen wenn die ROI hell genug ist (echte Karte hat weißen Hintergrund).
+            # Tisch-Hintergrund / Dekorationen sind dunkel (<100 Mittelwert), echte Karten hell (>130).
+            if roi.size > 0:
+                roi_mean_brightness = float(roi.mean())
+                if roi_mean_brightness < 100.0:
+                    logger.debug(
+                        f"Hero-ROI {hero_context} zu dunkel ({roi_mean_brightness:.0f}) – keine Karte erkannt."
+                    )
+                    cards.append(None)
+                    continue
             cards.append(self._process_card_roi(roi, context=hero_context))
         unique_cards: List[Card] = []
         for card in cards:

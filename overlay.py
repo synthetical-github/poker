@@ -27,6 +27,8 @@ class OverlayWindow:
         self._lock = threading.Lock()
         self._pending: Optional[dict] = None
         self._running = False
+        self._visible = True
+        self._stop_event = None
 
     def start(self):
         if self._running:
@@ -42,6 +44,13 @@ class OverlayWindow:
                 self._root.after(0, self._root.destroy)
             except Exception:
                 pass
+
+    def run_blocking(self, stop_event=None):
+        """Run overlay in the current (main) thread. Blocks until closed.
+        Must be called from the main thread on Windows."""
+        self._stop_event = stop_event
+        self._running = True
+        self._run()
 
     def update(self, data: dict):
         """Thread-safe update. data keys: action, amount, street, hole, board,
@@ -117,6 +126,14 @@ class OverlayWindow:
 
     def _tick(self):
         if not self._running:
+            if self._root:
+                try:
+                    self._root.quit()
+                except Exception:
+                    pass
+            return
+        if self._stop_event is not None and self._stop_event.is_set():
+            self.stop()
             return
         self._apply_pending()
         if self._root:

@@ -56,6 +56,9 @@ LIVE_CONFIG = {
         'poker swiss casinos': 'acipayam_heads_up',
     },
 
+    # Auto-Modus: Bot spielt selbstständig (Aktionen werden automatisch ausgeführt)
+    'auto_mode': False,
+
     # Laufzeit / Anzeige
     'voice_enabled': False,
     'show_overlay': True,

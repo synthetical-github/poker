@@ -57,9 +57,15 @@ def main():
     setup_hotkeys(bot)
     bot.run_analysis_thread()
 
+    show_overlay = not headless and bool(LIVE_CONFIG.get('show_overlay', True))
+
     try:
-        while bot.running and not bot.stop_event.is_set():
-            time.sleep(0.2)
+        if show_overlay:
+            # Tkinter muss im Hauptthread laufen (Windows-Anforderung)
+            bot.overlay.run_blocking(bot.stop_event)
+        else:
+            while bot.running and not bot.stop_event.is_set():
+                time.sleep(0.2)
 
     except KeyboardInterrupt:
         logger.info("Strg+C erkannt. Beende Bot...")

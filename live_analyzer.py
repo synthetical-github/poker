@@ -25,7 +25,7 @@ class LivePokerAnalyzer:
         self.headless = headless
         self.running = False
         self.paused = False
-        self.auto_mode = False
+        self.auto_mode = bool(LIVE_CONFIG.get('auto_mode', False))
         self.stop_event = threading.Event()
 
         self.card_detector = CardDetector()
@@ -65,8 +65,6 @@ class LivePokerAnalyzer:
         _os.makedirs(self._auto_capture_dir, exist_ok=True)
 
         self.overlay = OverlayWindow()
-        if LIVE_CONFIG.get('show_overlay', True):
-            self.overlay.start()
 
     def start_capture_rounds(self, rounds: int = 2):
         """Startet automatische Screenshot-Aufnahme für N komplette Runden."""
@@ -380,12 +378,15 @@ class LivePokerAnalyzer:
             logger.debug(f"Overlay update error: {e}")
 
     def toggle_overlay(self):
-        if self.overlay._running:
-            self.overlay.stop()
-            logger.info("Overlay ausgeblendet.")
-        else:
-            self.overlay.start()
-            logger.info("Overlay eingeblendet.")
+        if self.overlay._root:
+            if self.overlay._visible:
+                self.overlay._root.after(0, self.overlay._root.withdraw)
+                self.overlay._visible = False
+                logger.info("Overlay ausgeblendet.")
+            else:
+                self.overlay._root.after(0, self.overlay._root.deiconify)
+                self.overlay._visible = True
+                logger.info("Overlay eingeblendet.")
 
     def _build_state_signature(self, game_state: Dict[str, Any]) -> tuple:
         return (
