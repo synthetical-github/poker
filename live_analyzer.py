@@ -52,6 +52,7 @@ class LivePokerAnalyzer:
         self.required_stable_frames = 1
         self.last_strategy = None
         self.last_valid_stacks: Dict[str, Optional[float]] = {'hero': None, 'villain': None}
+        self._last_known_hole_cards: list = []
 
         # Screenshot-Aufnahme für N Runden (manuell via F9)
         self._capture_rounds_remaining = 0
@@ -614,11 +615,20 @@ class LivePokerAnalyzer:
         game_state: Dict[str, Any],
     ) -> Dict[str, Any]:
         previous_state = self.current_game_state
-        if not previous_state:
-            self._remember_valid_stacks(game_state.get('hero_stack'), game_state.get('villain_stack'))
-            return game_state
-
         stabilized = dict(game_state)
+        current_hole_cards = [card for card in stabilized.get('hole_cards', []) if card]
+
+        # Always track last successfully detected hole cards
+        if len(current_hole_cards) == 2:
+            self._last_known_hole_cards = list(current_hole_cards)
+
+        if not previous_state:
+            # No previous state, but inject last known hole cards if detection failed
+            if len(current_hole_cards) != 2 and len(self._last_known_hole_cards) == 2:
+                stabilized['hole_cards'] = list(self._last_known_hole_cards)
+            self._remember_valid_stacks(game_state.get('hero_stack'), game_state.get('villain_stack'))
+            return stabilized
+
         previous_hole_cards = [card for card in previous_state.get('hole_cards', []) if card]
         current_hole_cards = [card for card in stabilized.get('hole_cards', []) if card]
         previous_board_cards = [card for card in previous_state.get('community_cards', []) if card]
@@ -629,7 +639,11 @@ class LivePokerAnalyzer:
         if len(previous_hole_cards) == 2:
             board_grew = current_board_count > previous_board_count
             preserve_hole_cards = current_board_count > 0 and (board_grew or previous_board_count > 0)
-            if len(current_hole_cards) != 2 and preserve_hole_cards:
+            # Also preserve when detection returns nothing (momentary failure), even at preflop
+            if len(current_hole_cards) == 0:
+                stabilized['hole_cards'] = previous_state.get('hole_cards', [])
+                current_hole_cards = [card for card in stabilized.get('hole_cards', []) if card]
+            elif len(current_hole_cards) != 2 and preserve_hole_cards:
                 stabilized['hole_cards'] = previous_state.get('hole_cards', [])
                 current_hole_cards = [card for card in stabilized.get('hole_cards', []) if card]
             elif current_hole_cards != previous_hole_cards and preserve_hole_cards:

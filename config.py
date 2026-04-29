@@ -47,7 +47,7 @@ LIVE_CONFIG = {
     'allow_screen_fallback': False,
 
     # Layout-Erkennung
-    'table_layout': 'auto',
+    'table_layout': 'acipayam_heads_up',
     'default_table_layout': 'acipayam_heads_up',
     'table_layout_hints': {
         'heads up': 'heads_up',
@@ -85,7 +85,7 @@ POKER_SETTINGS = {
     'suits': ['C', 'D', 'H', 'S'],
     'ranks': ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'],
     'rank_map': {rank: i for i, rank in enumerate(['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'])},
-    'num_players': 9,
+    'num_players': 2,
 }
 
 TABLE_LAYOUTS = {

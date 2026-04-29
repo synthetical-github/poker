@@ -9,20 +9,17 @@ import numpy as np
 import pytesseract
 
 from utils.logger import logger
-from utils.card_utils import Card, parse_card_string
 from config import (
-    LIVE_CONFIG,
     TABLE_TEMPLATE_PATH,
-    POKER_SETTINGS,
-    ASSETS_DIR,
     get_current_table_layout_name,
     get_table_rois,
 )
 
+
 class TableParser:
     def __init__(self):
         self.table_template = self._load_template(TABLE_TEMPLATE_PATH)
-        self.table_detection_threshold = 0.8 # Konfigurierbar machen?
+        self.table_detection_threshold = 0.8  # Konfigurierbar machen?
         self.layout_name = ""
         self.reference_width = 0
         self.reference_height = 0
@@ -68,20 +65,26 @@ class TableParser:
             logger.error(f"Konnte Template nicht laden: {path}")
         return template
 
-    def _find_template_on_image(self, image_gray: np.ndarray, template: Optional[np.ndarray], threshold: float) -> Optional[Tuple[int, int, int, int]]:
+    def _find_template_on_image(
+        self,
+        image_gray: np.ndarray,
+        template: Optional[np.ndarray],
+        threshold: float,
+    ) -> Optional[Tuple[int, int, int, int]]:
         """ Findet ein Template im Bild und gibt die Bounding Box zurück. """
-        if template is None or image_gray is None: return None
-        
+        if template is None or image_gray is None:
+            return None
+
         # Sicherstellen, dass Template nicht größer als Bild ist
         if template.shape[0] > image_gray.shape[0] or template.shape[1] > image_gray.shape[1]:
-             return None
+            return None
 
         res = cv2.matchTemplate(image_gray, template, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        
+
         if max_val >= threshold:
             # Gibt (x, y, width, height) der gefundenen Übereinstimmung zurück
-            return max_loc[0], max_loc[1], template.shape[1], template.shape[0]
+            return (max_loc[0], max_loc[1], template.shape[1], template.shape[0])
         return None
 
     def _get_absolute_coords(self, table_coords: Tuple[int, int, int, int], relative_roi: Dict[str, Any]) -> Tuple[int, int, int, int]:
@@ -147,12 +150,12 @@ class TableParser:
         """ Parst Tisch-Informationen wie Pot, Einsätze, Spielerpositionen etc. """
         self._refresh_layout()
         if table_coords is None:
-             # Versuche, den Tisch zu finden, wenn keine Koordinaten gegeben sind
-             # Dies würde eine Funktion wie find_table() aus image_processor.py benötigen
-             logger.warning("Keine Tischkoordinaten übergeben. Tisch-spezifische ROIs können nicht angewendet werden.")
-             # Hier könnte man versuchen, eine globale Suche durchzuführen, aber das ist weniger effizient.
-             # Fürs Erste: Rückgabe von Standardwerten oder Fehler.
-             return self._parse_global_elements(screenshot_bgr) # Versuch, globale Elemente zu finden
+            # Versuche, den Tisch zu finden, wenn keine Koordinaten gegeben sind
+            # Dies würde eine Funktion wie find_table() aus image_processor.py benötigen
+            logger.warning("Keine Tischkoordinaten übergeben. Tisch-spezifische ROIs können nicht angewendet werden.")
+            # Hier könnte man versuchen, eine globale Suche durchzuführen, aber das ist weniger effizient.
+            # Fürs Erste: Rückgabe von Standardwerten oder Fehler.
+            return self._parse_global_elements(screenshot_bgr)  # Versuch, globale Elemente zu finden
 
         table_x, table_y, table_w, table_h = table_coords
         parse_fingerprint = self._make_parse_fingerprint(screenshot_bgr, table_coords)
@@ -161,21 +164,21 @@ class TableParser:
 
         parsed_data = {
             'pot_size': 0.0,
-            'current_bet': 0.0, # Aktueller Höchsteinsatz
-            'to_call': 0.0,     # Was muss der Bot zahlen?
-            'num_players': self.num_players, # Standardwert
-            'position': 'unknown', # Position des Bots (z.B. 'button', 'early', 'middle', 'late')
-            'street': 'unknown', # 'preflop', 'flop', 'turn', 'river'
-            'dealer_button_pos': None, # Position des Dealers (0 bis num_players-1)
-            'active_player_turn': -1, # Index des Spielers, der am Zug ist (-1 = unbekannt)
-            'player_info': [{} for _ in range(self.num_players)], # Infos für jeden Spieler
-            'community_cards_detected': [], # Karten, die als Community-Karten erkannt wurden
+            'current_bet': 0.0,  # Aktueller Höchsteinsatz
+            'to_call': 0.0,  # Was muss der Bot zahlen?
+            'num_players': self.num_players,  # Standardwert
+            'position': 'unknown',  # Position des Bots (z.B. 'button', 'early', 'middle', 'late')
+            'street': 'unknown',  # 'preflop', 'flop', 'turn', 'river'
+            'dealer_button_pos': None,  # Position des Dealers (0 bis num_players-1)
+            'active_player_turn': -1,  # Index des Spielers, der am Zug ist (-1 = unbekannt)
+            'player_info': [{} for _ in range(self.num_players)],  # Infos für jeden Spieler
+            'community_cards_detected': [],  # Karten, die als Community-Karten erkannt wurden
             'roi_regions': {},
         }
         amount_cache: Dict[Tuple[str, int, int, int, int], float] = {}
 
         img_gray = cv2.cvtColor(screenshot_bgr, cv2.COLOR_BGR2GRAY)
-        
+
         # --- Parse Elemente basierend auf ROIs ---
         for name, definition in self.roi_definitions.items():
             try:
@@ -210,7 +213,7 @@ class TableParser:
                 abs_coords = self._get_absolute_coords(table_coords, definition)
                 parsed_data['roi_regions'][name] = abs_coords
                 x, y, w, h = abs_coords
-                
+
                 # Stelle sicher, dass die ROI innerhalb des Screenshots liegt
                 img_h, img_w = screenshot_bgr.shape[:2]
                 if x < 0 or y < 0 or x+w > img_w or y+h > img_h:
@@ -273,12 +276,13 @@ class TableParser:
             # Entferne ggf. Tausendertrennzeichen, wenn sie vor dem Dezimalpunkt stehen
             if '.' in cleaned and cleaned.count('.') > 1:
                 parts = cleaned.split('.')
-                if len(parts[-1]) <= 3: # Annahme: Letzter Teil ist Dezimalzahl
-                    cleaned = "".join(parts[:-1]) + "." + parts[-1]
-                else: # Annahme: Punkte sind Tausendertrenner
+                if len(parts[-1]) <= 3:  # Annahme: Letzter Teil ist Dezimalzahl
+                    cleaned = ".".join(parts[:-1]) + "." + parts[-1]
+                else:  # Annahme: Punkte sind Tausendertrenner
                     cleaned = cleaned.replace('.', '')
-            
-            if not cleaned: return 0.0
+
+            if not cleaned:
+                return 0.0
             return float(cleaned)
         except ValueError:
             logger.warning(f"Konnte Betrag nicht parsen: '{text}'")
@@ -286,7 +290,7 @@ class TableParser:
 
     def _read_text_variants(self, roi_gray: np.ndarray, configs: List[str]) -> List[str]:
         texts: List[str] = []
-        if roi_gray is None or roi_gray.size == 0:
+        if roi_gray is None or roi_gray.size == 0:  # noqa: E701
             return texts
 
         resized_for_key = cv2.resize(roi_gray, (96, 32), interpolation=cv2.INTER_AREA)
@@ -501,7 +505,7 @@ class TableParser:
         cleaned = cleaned.replace('O', '0').replace('o', '0')
         cleaned = cleaned.replace('l', '1').replace('I', '1')
         cleaned = cleaned.replace('S', '5').replace('s', '5')
-        cleaned = cleaned.replace(',', '.') # Standardisiere Dezimaltrennzeichen
+        cleaned = cleaned.replace(',', '.')  # Standardisiere Dezimaltrennzeichen
         cleaned = ' '.join(cleaned.split())
         return cleaned.strip()
 

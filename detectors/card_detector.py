@@ -1543,6 +1543,7 @@ class CardDetector:
             return None
 
         h, w = roi_bgr.shape[:2]
+
         y_start = max(1, int(h * 0.02))
         y_end = max(y_start + 1, h - max(1, int(h * 0.04)))
 
@@ -1558,8 +1559,6 @@ class CardDetector:
         cropped = roi_bgr[y_start:y_end, x_start:x_end]
         if cropped.size == 0:
             return roi_bgr
-        if self.layout_name == "acipayam_heads_up":
-            return cropped
 
         isolated = self._extract_card_surface(cropped)
         if isolated is None or isolated.size == 0:
