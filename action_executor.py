@@ -56,9 +56,35 @@ class ActionExecutor:
         self.action_rois = get_table_action_rois(layout_name)
         self.reference_width, self.reference_height = self.action_rois['reference_size']
 
+    def _get_click_base_region(self) -> Tuple[int, int, int, int]:
+        """Returns the screen region (absolute screen coords) to use for button click positions.
+
+        In window-capture mode the screenshot is cropped to the client area whose
+        top-left corner is NOT necessarily at (0, 0) on screen.  Using the full
+        desktop dimensions as the base causes click coordinates to be shifted by
+        the window's screen offset, which can make a 'fold' click land on 'call'.
+        """
+        capture_method = str(LIVE_CONFIG.get('capture_method', 'window')).strip().lower()
+        if capture_method == 'window':
+            try:
+                from utils.screen_utils import window_cache, _get_window_client_box, _cached_window_is_usable
+                hwnd = window_cache.get('hwnd')
+                if hwnd and _cached_window_is_usable(hwnd):
+                    client_box = _get_window_client_box(hwnd)
+                    if client_box:
+                        return client_box
+            except Exception as exc:
+                logger.debug(f"Konnte Fenster-Client-Bereich nicht ermitteln: {exc}")
+
+        if self.screen_region:
+            return self.screen_region
+        size = pyautogui.size()
+        return (0, 0, size.width, size.height)
+
     def _load_button_coordinates(self) -> dict:
         """ Lädt die Koordinaten der Buttons (Fold, Call, Raise, Bet, Check). """
-        button_regions = self.get_button_regions()
+        click_region = self._get_click_base_region()
+        button_regions = self.get_button_regions(base_region=click_region)
         coords = {
             'fold': self._center_of_region(button_regions['fold_button']),
             'call': self._center_of_region(button_regions['check_button']),
@@ -68,7 +94,7 @@ class ActionExecutor:
             'bet_input_field': self._center_of_region(button_regions['bet_input_field']),
         }
 
-        logger.debug(f"Geladene Button-Koordinaten: {coords}")
+        logger.debug(f"Geladene Button-Koordinaten (base={click_region}): {coords}")
         return coords
 
     def _scale_region(
@@ -285,6 +311,7 @@ class ActionExecutor:
                 if len(raw) == 2:
                     if value % 10 == 0:
                         return [value / 100.0]
+                    else:
                         return [value / 10.0]
                 if len(raw) in {3, 4}:
                     return [value / 100.0]

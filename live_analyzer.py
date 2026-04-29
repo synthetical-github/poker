@@ -1172,14 +1172,21 @@ class LivePokerAnalyzer:
                         ):
                             rec_action = str(strategy.get('recommended_action', '')).lower()
                             rec_amount = float(strategy.get('amount', 0.0) or 0.0)
+                            available = game_state.get('available_actions', [])
                             if rec_action in ('fold', 'call', 'check', 'bet', 'raise'):
-                                logger.info(f"[AUTO] Führe aus: {rec_action.upper()} {rec_amount:.2f}")
-                                print(f"[AUTO] {rec_action.upper()} {rec_amount:.2f}", flush=True)
-                                try:
-                                    self.execute_action(rec_action, rec_amount)
-                                    self.last_action_taken = str(state_signature)
-                                except Exception as e:
-                                    logger.error(f"[AUTO] Fehler bei Ausführung: {e}")
+                                if rec_action not in available:
+                                    logger.warning(
+                                        f"[AUTO] Aktion '{rec_action.upper()}' nicht in "
+                                        f"verfügbaren Aktionen {available} – übersprungen."
+                                    )
+                                else:
+                                    logger.info(f"[AUTO] Führe aus: {rec_action.upper()} {rec_amount:.2f}")
+                                    print(f"[AUTO] {rec_action.upper()} {rec_amount:.2f}", flush=True)
+                                    try:
+                                        self.execute_action(rec_action, rec_amount)
+                                        self.last_action_taken = str(state_signature)
+                                    except Exception as e:
+                                        logger.error(f"[AUTO] Fehler bei Ausführung: {e}")
 
                     elif self.current_game_state and self.last_strategy:
                         self._print_live_summary(self.current_game_state, self.last_strategy)

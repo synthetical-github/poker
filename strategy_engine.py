@@ -33,15 +33,21 @@ class StrategyEngine:
             current_bet = 0.0
         hero_stack = table_info.get("hero_stack")
         hero_stack_value = float(hero_stack) if hero_stack is not None else None
-        if hero_stack_value is not None and hero_stack_value > 0:
-            if to_call > hero_stack_value * 1.05:
-                to_call = 0.0
-            if current_bet > hero_stack_value * 1.05:
-                current_bet = 0.0
         num_players = int(table_info.get("num_players_remaining", table_info.get("num_players", 2)) or 2)
         position = table_info.get("position", "unknown")
         street = table_info.get("street", "preflop")
         available_actions = list(dict.fromkeys(table_info.get("available_actions", [])))
+        if hero_stack_value is not None and hero_stack_value > 0:
+            if to_call >= hero_stack_value * 0.95:
+                # Hero is facing an effective all-in – can only fold or call; remove raise/bet
+                available_actions = [a for a in available_actions if a in ("fold", "call")]
+                to_call = min(to_call, hero_stack_value)
+                current_bet = 0.0
+            elif to_call > hero_stack_value * 1.05:
+                to_call = 0.0
+                current_bet = 0.0
+            elif current_bet > hero_stack_value * 1.05:
+                current_bet = 0.0
 
         if len(valid_hole_cards) != 2:
             logger.warning("Ungültige oder fehlende Hole Cards. Fallback auf 'fold'.")

@@ -687,7 +687,8 @@ class MonteCarloStrategy:
         if label == "bet_pot":
             ev -= pot_size * 0.12
         if label == "jam":
-            ev -= pot_size * 0.35
+            # Scale penalty by hero_cost so deep-stack jams are not over-rewarded
+            ev -= pot_size * 0.35 + hero_cost * 0.22
         return ev
 
     def _estimate_flop_action_ev(self, action: Dict[str, Any], context: Dict[str, float | str | bool]) -> float:
@@ -918,7 +919,11 @@ class MonteCarloStrategy:
         if label == "bet_pot":
             ev += pot_size * (0.10 if rank_value >= 4 else (-0.08 if rank_value <= 1 and bluff_bonus <= 0 else 0.02))
         if label == "jam":
-            ev += pot_size * 0.08 if (rank_value >= 5 or (rank_value == 0 and bluff_bonus > 0 and spr <= 1.4)) else -pot_size * 0.20
+            if rank_value >= 5 or (rank_value == 0 and bluff_bonus > 0 and spr <= 1.4):
+                ev += pot_size * 0.08
+            else:
+                # Scale penalty by hero_cost so deep-stack river jams are not over-rewarded
+                ev -= pot_size * 0.20 + hero_cost * 0.22
         return ev
 
     def _estimate_confidence(
