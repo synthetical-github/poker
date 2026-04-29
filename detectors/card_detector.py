@@ -616,8 +616,14 @@ class CardDetector:
             return None
         if cleaned.startswith('10'):
             return 'T'
+        # Handle border artifact: OCR reads a left-edge line as '1' before the real rank
+        # e.g. '18' -> '8', '1J' -> 'J'. Only applies when '1' is followed by a valid rank.
+        if len(cleaned) >= 2 and cleaned[0] == '1' and cleaned[1] in self.ranks:
+            return cleaned[1]
+        # Standalone '1' is ambiguous (could be border artifact OR clipped '10').
+        # Don't map it to 'T' here; let template matching handle it; only return None.
         if cleaned == '1':
-            return 'T'
+            return None
         rank = cleaned[0]
         rank_aliases = {'0': 'Q', 'O': 'Q', 'I': 'T', 'L': 'T', '1': 'T'}
         rank = rank_aliases.get(rank, rank)
@@ -1065,6 +1071,11 @@ class CardDetector:
         if crop.size == 0:
             return None
 
+        # Cache by crop hash to avoid repeated Tesseract calls on same frame
+        crop_key = (crop.shape, crop.tobytes()[:512])
+        if hasattr(self, '_title_hint_cache') and crop_key in self._title_hint_cache:
+            return self._title_hint_cache[crop_key]
+
         gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
         enlarged = cv2.resize(gray, None, fx=2.5, fy=2.5, interpolation=cv2.INTER_CUBIC)
         _, thresh = cv2.threshold(enlarged, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -1075,10 +1086,16 @@ class CardDetector:
 
         normalized = text.upper()
         if "HEADS UP" in normalized:
-            return "heads_up"
-        if "ARZON" in normalized:
-            return "acipayam_heads_up"
-        return None
+            result = "heads_up"
+        elif "ARZON" in normalized:
+            result = "acipayam_heads_up"
+        else:
+            result = None
+
+        if not hasattr(self, '_title_hint_cache'):
+            self._title_hint_cache: Dict[tuple, Optional[str]] = {}
+        self._title_hint_cache[crop_key] = result
+        return result
 
     def _store_frame_detection(
         self,
@@ -1312,10 +1329,25 @@ class CardDetector:
                     best = candidate
 
         self._apply_layout_profile(best["layout_name"])
+
+        # Showdown contamination guard: a card cannot appear both in hole cards and community cards.
+        # If a hole card duplicates a community card, clear the hole cards so live_analyzer
+        # stabilization can fall back to the last known good state.
+        best_hole = list(best["hole_cards"])
+        best_board = list(best["community_cards"])
+        if best_hole and best_board:
+            board_strs = {str(c) for c in best_board if c}
+            contaminated = any(str(c) in board_strs for c in best_hole if c)
+            if contaminated:
+                logger.debug(
+                    f"Showdown contamination detected: hole={best_hole} board={best_board} — clearing hole cards"
+                )
+                best_hole = []
+
         detection = {
             "layout_name": best["layout_name"],
-            "hole_cards": best["hole_cards"],
-            "community_cards": best["community_cards"],
+            "hole_cards": best_hole,
+            "community_cards": best_board,
         }
         self._store_frame_detection(frame_key, detection)
         return detection
@@ -2097,6 +2129,36 @@ class CardDetector:
                         self._store_cached_roi_result(cache_key, card)
                         return card
 
+        # For heads_up hero cards: compute hero template stats ONCE and reuse for all checks.
+        _hu_hero_name: Optional[str] = None
+        _hu_hero_score: float = -1.0
+        _hu_hero_second: float = -1.0
+        if (
+            self.layout_name == 'heads_up'
+            and card_surface is not None
+            and card_surface.size > 0
+            and context.startswith("hero")
+            and self.hero_card_templates
+        ):
+            _hu_hero_name, _hu_hero_score, _hu_hero_second, _ = self._get_card_template_stats_from_map(
+                match_gray,
+                self.hero_card_templates,
+            )
+            hu_hero_gap = _hu_hero_score - _hu_hero_second
+            # Pre-focus: return immediately on high-confidence template match
+            if _hu_hero_name and _hu_hero_score >= 0.95 and hu_hero_gap >= 0.10:
+                card = parse_card_string(_hu_hero_name)
+                if card:
+                    logger.debug(
+                        f"heads_up Hero-Karte ueber Vollkarten-Templates erkannt (pre-focus): {card} "
+                        f"(Konfidenz: {_hu_hero_score:.2f}, Gap: {hu_hero_gap:.2f})"
+                    )
+                    self._store_cached_roi_result(cache_key, card)
+                    return card
+            if _hu_hero_name and _hu_hero_score >= 0.77:
+                _hero_fallback_name = _hu_hero_name
+                _hero_fallback_score = _hu_hero_score
+
         if (
             self.layout_name == 'heads_up'
             and card_surface is not None
@@ -2105,8 +2167,91 @@ class CardDetector:
         ):
             focus_card = self._detect_card_from_compact_focus(card_surface, context=context)
             if focus_card:
+                # If hero template strongly suggests a different rank (same suit, different rank),
+                # trust the template over compact_focus (handles OCR T→2 confusion)
+                # Reuse already-computed _hu_hero_name/_hu_hero_score from above.
+                if context.startswith("hero") and _hu_hero_name and _hu_hero_score >= 0.95 and (_hu_hero_score - _hu_hero_second) >= 0.02:
+                    tmpl_card = parse_card_string(_hu_hero_name)
+                    if (tmpl_card
+                            and tmpl_card.suit == focus_card.suit
+                            and tmpl_card.rank != focus_card.rank):
+                        logger.debug(
+                            f"heads_up: Template overrides compact_focus rank: "
+                            f"{_hu_hero_name} ({_hu_hero_score:.2f}) vs {focus_card}"
+                        )
+                        self._store_cached_roi_result(cache_key, tmpl_card)
+                        return tmpl_card
                 self._store_cached_roi_result(cache_key, focus_card)
                 return focus_card
+            # compact_focus returned None: skip corner detection for heads_up board cards.
+            # Corner detection is not calibrated for heads_up board ROIs.
+            if context.startswith("board"):
+                self._store_cached_roi_result(cache_key, None)
+                return None
+
+        # For heads_up hero cards: if compact focus failed, fall back to hero card templates.
+        # Reuse already-computed stats (no extra matchTemplate calls).
+        if (
+            self.layout_name == 'heads_up'
+            and card_surface is not None
+            and card_surface.size > 0
+            and context.startswith("hero")
+            and _hu_hero_name is not None
+        ):
+            hu_hero_gap = _hu_hero_score - _hu_hero_second
+            if _hu_hero_name and _hu_hero_score >= 0.80 and hu_hero_gap >= 0.02:
+                card = parse_card_string(_hu_hero_name)
+                if card:
+                    logger.debug(
+                        f"heads_up Hero-Karte ueber Vollkarten-Templates erkannt: {card} "
+                        f"(Konfidenz: {_hu_hero_score:.2f}, Gap: {hu_hero_gap:.2f})"
+                    )
+                    self._store_cached_roi_result(cache_key, card)
+                    return card
+            if _hu_hero_name and _hu_hero_score >= 0.77:
+                _hero_fallback_name = _hu_hero_name
+                _hero_fallback_score = _hu_hero_score
+
+        # For acipayam_heads_up hero cards: if we have a fallback from hero templates,
+        # use it directly rather than running expensive corner detection (1140 matchTemplate calls).
+        if (
+            self.layout_name == 'acipayam_heads_up'
+            and context.startswith("hero")
+            and _hero_fallback_name
+            and _hero_fallback_score >= 0.77
+        ):
+            fallback_card = parse_card_string(_hero_fallback_name)
+            if fallback_card:
+                logger.debug(
+                    f"acipayam Hero-Karte Fallback (skip corner): {fallback_card} "
+                    f"(score={_hero_fallback_score:.2f})"
+                )
+                self._store_cached_roi_result(cache_key, fallback_card)
+                return fallback_card
+
+        # For acipayam_heads_up: skip corner detection entirely.
+        # Hero cards with low template confidence are handled by the heads_up layout.
+        # Board cards are detected via compact_focus in the heads_up layout.
+        if self.layout_name == 'acipayam_heads_up':
+            self._store_cached_roi_result(cache_key, None)
+            return None
+
+        # For heads_up hero cards: if hero template produced any fallback (score >= 0.77),
+        # use it rather than running expensive corner detection.
+        if (
+            self.layout_name == 'heads_up'
+            and context.startswith("hero")
+            and _hero_fallback_name
+            and _hero_fallback_score >= 0.77
+        ):
+            fallback_card = parse_card_string(_hero_fallback_name)
+            if fallback_card:
+                logger.debug(
+                    f"heads_up Hero-Karte Fallback (skip corner): {fallback_card} "
+                    f"(score={_hero_fallback_score:.2f})"
+                )
+                self._store_cached_roi_result(cache_key, fallback_card)
+                return fallback_card
 
         if card_surface is not None and card_surface.size > 0:
             corner_card = self._detect_card_from_corner(card_surface, context=context)
